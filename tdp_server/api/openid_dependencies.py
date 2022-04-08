@@ -4,6 +4,7 @@ from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from fastapi import Depends, HTTPException, status
 from fastapi.security import SecurityScopes
 from fastapi.security.open_id_connect_url import OpenIdConnect
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 
 from tdp_server.core.config import settings
@@ -48,14 +49,16 @@ async def issuer_public_key(
 
 async def validate_token(
     security_scopes: SecurityScopes,
-    token: Optional[str] = Depends(openid_connect),
+    authorization: Optional[str] = Depends(openid_connect),
     metadata: dict = Depends(issuer_metadata),
     public_key: str = Depends(issuer_public_key),
 ):
     token_info = None
     try:
-        if token:
-            token = token[7:]  # Remove "Bearer " from token
+        if authorization:
+            scheme, token = get_authorization_scheme_param(authorization)
+            if scheme.lower() != "bearer":
+                raise Exception("invalid authentication type")
             token_info = jwt.decode(
                 token,
                 public_key,
@@ -69,6 +72,7 @@ async def validate_token(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Error during authentication validation ({exp})",
+            headers={"WWW-Authenticate": f"Bearer"},
         )
 
     for scope in security_scopes.scopes:
