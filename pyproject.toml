@@ -6,8 +6,7 @@ authors = ["Guillaume Boutry <diode-boutry.consultant@dgfip.finances.gouv.fr>"]
 
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
-fastapi = { version = "0.75.0", extras = ["all"] }
-uvicorn = { version = "0.15.0", extras = ["standard"] }
+fastapi = { version = "0.75.0" }
 tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib" }
 alembic = "1.7.7"
 tenacity = "8.0.1"
@@ -21,6 +20,7 @@ pytest = "6.2.5"
 black = "21.12b0"
 isort = "4.3.21"
 poetry-githooks = "2.0.0"
+uvicorn = { version = "0.15.0", extras = ["standard"] }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
