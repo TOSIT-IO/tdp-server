@@ -2,16 +2,25 @@ import logging
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from tdp.core.dag import Dag
-from tdp.core.repository.git_repository import GitRepository
-from tdp.core.service_manager import ServiceManager
 
+from tdp.core.dag import Dag
+from tdp.core.service_manager import ServiceManager
 from tdp_server.api import dependencies
 from tdp_server.schemas import Component, Service, ServiceUpdate
 from tdp_server.schemas.service import ServiceUpdateResponse
+from tdp_server.services.variables_crud import VariablesCrud
 
 logger = logging.getLogger("tdp_server")
 router = APIRouter()
+
+SERVICE_ID_DOES_NOT_EXISTS_ERROR = {
+    400: {
+        "description": "Service id does not exists",
+        "content": {
+            "application/json": {"example": {"detail": "{service_id} does not exists"}}
+        },
+    }
+}
 
 
 @router.get(
@@ -23,6 +32,9 @@ router = APIRouter()
 def get_services(
     *,
     dag: Dag = Depends(dependencies.get_dag),
+    service_managers: Dict[str, ServiceManager] = Depends(
+        dependencies.get_service_managers
+    ),
 ) -> Any:
     """
     Returns the list of services
@@ -35,6 +47,7 @@ def get_services(
                 components=[
                     Component(id=component.name) for component in service_components
                 ],
+                variables=VariablesCrud.get_variables(service_managers[service]),
             )
         )
     return services
@@ -46,20 +59,16 @@ def get_services(
     response_model=Service,
     responses={
         **dependencies.COMMON_RESPONSES,
-        400: {
-            "description": "Service id provided does not exists",
-            "content": {
-                "application/json": {
-                    "example": {"detail": "{service_id} does not exists"}
-                }
-            },
-        },
+        **SERVICE_ID_DOES_NOT_EXISTS_ERROR,
     },
 )
 def get_service(
     *,
     service_id: str,
     dag: Dag = Depends(dependencies.get_dag),
+    service_managers: Dict[str, ServiceManager] = Depends(
+        dependencies.get_service_managers
+    ),
 ) -> Any:
     """
     Gets service identified by its id
@@ -70,6 +79,7 @@ def get_service(
         return Service(
             id=service_id,
             components=[Component(id=component.name) for component in components],
+            variables=VariablesCrud.get_variables(service_managers[service_id]),
         )
     except KeyError:
         raise HTTPException(
@@ -80,9 +90,8 @@ def get_service(
 
 @router.patch(
     "/{service_id}",
-    dependencies=[Depends(dependencies.write_protected)],
     response_model=ServiceUpdateResponse,
-    responses={**dependencies.COMMON_RESPONSES},
+    responses={**dependencies.COMMON_RESPONSES, **SERVICE_ID_DOES_NOT_EXISTS_ERROR},
 )
 def patch_service(
     *,
@@ -91,7 +100,8 @@ def patch_service(
     service_managers: Dict[str, ServiceManager] = Depends(
         dependencies.get_service_managers
     ),
-):
+    user: str = Depends(dependencies.write_protected),
+) -> Any:
     """
     Modifies a service definition.
     """
@@ -103,33 +113,54 @@ def patch_service(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"{service_id} does not exist.",
         )
-    update_message = f"[{service_id}] {service_update.message}"
-    repository: GitRepository = service_manager.repository
+    update_message = service_update.message + f"\n\nuser: {user}"
     try:
-        with repository.validate(update_message) as repo, repo.open_var_file(
-            f"{service_id}.yml"
-        ) as service_variables:
-            service_variables.update(service_update.variables.__root__)
-        version = repository.current_version()
+        version, message = VariablesCrud.update_variables(
+            service_manager,
+            service_update.variables.__root__,
+            update_message,
+            merge=True,
+        )
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    return {"message": update_message, "version": version}
+    return ServiceUpdateResponse(message=message, version=version)
 
 
 @router.put(
     "/{service_id}",
-    dependencies=[Depends(dependencies.write_protected)],
-    response_model=Service,
-    responses={**dependencies.COMMON_RESPONSES},
+    response_model=ServiceUpdateResponse,
+    responses={**dependencies.COMMON_RESPONSES, **SERVICE_ID_DOES_NOT_EXISTS_ERROR},
 )
 def put_service(
     *,
     service_id: str,
     service_update: ServiceUpdate,
-    dag: Dag = Depends(dependencies.get_dag),
+    service_managers: Dict[str, ServiceManager] = Depends(
+        dependencies.get_service_managers
+    ),
+    user: str = Depends(dependencies.write_protected),
 ) -> Any:
     """
     Sets a service definition.
     """
-    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)
+    service_id = service_id.lower()
+    try:
+        service_manager = service_managers[service_id]
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{service_id} does not exist.",
+        )
+    update_message = service_update.message + f"\n\nuser: {user}"
+    try:
+        version, message = VariablesCrud.update_variables(
+            service_manager,
+            service_update.variables.__root__,
+            update_message,
+            merge=False,
+        )
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return ServiceUpdateResponse(message=message, version=version)

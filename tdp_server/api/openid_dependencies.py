@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Mapping, Optional
 
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from fastapi import Depends, HTTPException, status
@@ -52,7 +52,7 @@ async def validate_token(
     authorization: Optional[str] = Depends(openid_connect),
     metadata: dict = Depends(issuer_metadata),
     public_key: str = Depends(issuer_public_key),
-):
+) -> Mapping:
     token_info = None
     try:
         if authorization:
@@ -82,3 +82,4 @@ async def validate_token(
                 detail="Not enough permissions",
                 headers={"WWW-Authenticate": f"Bearer {security_scopes.scope_str}"},
             )
+    return token_info

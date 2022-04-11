@@ -2,9 +2,9 @@ from functools import lru_cache
 from typing import Dict, Generator
 
 from fastapi import Depends, Security
+
 from tdp.core.dag import Dag
 from tdp.core.service_manager import ServiceManager
-
 from tdp_server.api.openid_dependencies import validate_token
 from tdp_server.core.config import settings
 from tdp_server.db.session import SessionLocal
@@ -49,18 +49,18 @@ def get_service_managers(dag: Dag = Depends(get_dag)) -> Dict[str, ServiceManage
 
 
 async def read_protected(
-    _=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":read"])
-):
-    pass
+    user_info=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":read"])
+) -> str:
+    return user_info["sub"]
 
 
 async def write_protected(
-    _=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":write"])
-):
-    pass
+    user_info=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":write"])
+) -> str:
+    return user_info["sub"]
 
 
 async def execute_protected(
-    _=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":execute"])
-):
-    pass
+    user_info=Security(validate_token, scopes=[settings.SCOPE_NAMESPACE + ":execute"])
+) -> str:
+    return user_info["sub"]
