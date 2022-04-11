@@ -1,14 +1,10 @@
-from typing import List, Mapping, Union
+from typing import Any, Mapping
 
 from pydantic import BaseModel
 
-SCALAR_TYPE = Union[str, int, float, bool, None]
-
 
 class Variables(BaseModel):
-    __root__: Mapping[
-        str, Union[SCALAR_TYPE, List[SCALAR_TYPE], Mapping[str, SCALAR_TYPE]]
-    ]
+    __root__: Mapping[str, Any]
 
     class Config:
         schema_extra = {
