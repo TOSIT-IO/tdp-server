@@ -12,7 +12,7 @@ class VariablesCrud:
         filename: str = name or service_manager.name
         repository = service_manager.repository
         with repository.open_var_file(filename + ".yml") as configuration:
-            return Variables(__root__=configuration._content)
+            return Variables(__root__=configuration.to_dict())
 
     @staticmethod
     def update_variables(
