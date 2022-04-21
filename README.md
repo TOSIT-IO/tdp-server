@@ -7,7 +7,7 @@
 #### Start development environment
 ```bash
 # Start docker services
-docker compose -f dev/docker-compose.yml up -d
+docker-compose -f dev/docker-compose.yml up -d
 ```
 
 #### Install dependencies, configure, create tables
