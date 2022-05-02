@@ -1,5 +1,6 @@
 from typing import Any, Mapping, Optional, Tuple
 
+from tdp.core.repository.repository import EmptyCommit
 from tdp.core.service_manager import ServiceManager
 from tdp_server.schemas import Variables
 
@@ -26,8 +27,11 @@ class VariablesCrud:
 
         update_message = f"[{service_manager.name}] {message}"
         repository = service_manager.repository
-        with repository.validate(update_message) as repo, repo.open_var_file(
-            f"{filename}.yml"
-        ) as service_variables:
-            service_variables.update(content, merge)
+        try:
+            with repository.validate(update_message) as repo, repo.open_var_file(
+                f"{filename}.yml"
+            ) as service_variables:
+                service_variables.update(content, merge)
+        except EmptyCommit as e:
+            raise ValueError(e)
         return repository.current_version(), update_message
