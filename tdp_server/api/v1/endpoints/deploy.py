@@ -2,8 +2,8 @@ import logging
 from typing import Any, Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, status
-
 from tdp.core.dag import Dag
+
 from tdp_server.api import dependencies
 from tdp_server.schemas import DeployRequest, DeployStatus
 from tdp_server.services.runner import RunnerService, StillRunningException
@@ -58,7 +58,8 @@ def deploy_node(
             targets=deploy_request.targets,
             node_filter=deploy_request.filter,
         )
-    except StillRunningException:
+    except StillRunningException as e:
+        logger.exception(e)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="another deployment is still running",
