@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from tdp_server.api.v1.endpoints import service
+from tdp_server.api.v1.endpoints import deploy, service
 
 api_router = APIRouter()
 
 api_router.include_router(service.router, prefix="/service", tags=["services"])
+api_router.include_router(deploy.router, prefix="/deploy", tags=["deploy"])
