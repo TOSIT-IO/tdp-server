@@ -1,1 +1,1 @@
-from tdp_server.models.user import User
+from .user_deployment_log import UserDeploymentLog
