@@ -32,20 +32,20 @@ COMMON_RESPONSES = {
     },
 }
 
+DAG = Dag()
+SERVICE_MANAGERS = ServiceManager.get_service_managers(DAG, settings.TDP_VARS)
 
 def get_db() -> Generator:
     with SessionLocal() as db:
         yield db
 
 
-@lru_cache()
 def get_dag() -> Dag:
-    return Dag()
+    return DAG
 
 
-@lru_cache()
-def get_service_managers(dag: Dag = Depends(get_dag)) -> Dict[str, ServiceManager]:
-    return ServiceManager.get_service_managers(dag, settings.TDP_VARS)
+def get_service_managers() -> Dict[str, ServiceManager]:
+    return SERVICE_MANAGERS
 
 
 async def read_protected(
