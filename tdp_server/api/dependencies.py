@@ -33,7 +33,7 @@ COMMON_RESPONSES = {
     },
 }
 
-DAG = Dag()
+DAG = Dag.from_collection(settings.TDP_COLLECTION_PATH)
 EXECUTOR = AnsibleExecutor(
     settings.TDP_COLLECTION_PATH / "playbooks", settings.TDP_RUN_DIRECTORY
 )
