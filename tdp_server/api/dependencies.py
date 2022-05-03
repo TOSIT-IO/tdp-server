@@ -1,10 +1,10 @@
 from typing import Dict, Generator
 
 from fastapi import Security
-
 from tdp.core.dag import Dag
 from tdp.core.runner.ansible_executor import AnsibleExecutor
 from tdp.core.service_manager import ServiceManager
+
 from tdp_server.api.openid_dependencies import validate_token
 from tdp_server.core.config import settings
 from tdp_server.db.session import SessionLocal
