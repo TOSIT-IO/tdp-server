@@ -24,12 +24,10 @@ class RunnerService:
     def __init__(
         self,
         dag: Dag,
-        playbooks_directory: PathLike,
         run_directory: PathLike,
         tdp_vars: PathLike,
     ):
         self.dag = dag
-        self.playbooks_directory = playbooks_directory
         self.run_directory = run_directory
         self.tdp_vars = tdp_vars
         self.process = None
@@ -45,7 +43,6 @@ class RunnerService:
             parent_conn, child_conn = Pipe()
             self.process = RunnerProcess(
                 self.dag,
-                self.playbooks_directory,
                 self.run_directory,
                 self.tdp_vars,
                 user,
@@ -72,7 +69,6 @@ class RunnerProcess(Process):
     def __init__(
         self,
         dag: Dag,
-        playbooks_directory: PathLike,
         run_directory: PathLike,
         tdp_vars: PathLike,
         user: str,
@@ -82,7 +78,6 @@ class RunnerProcess(Process):
     ) -> None:
         super(RunnerProcess, self).__init__()
         self.dag = dag
-        self.playbooks_directory = playbooks_directory
         self.run_directory = run_directory
         self.tdp_vars = tdp_vars
         self.user = user
@@ -101,7 +96,7 @@ class RunnerProcess(Process):
             self.send_status_to_parent(is_locked)
             if not is_locked:
                 return
-            executor = AnsibleExecutor(self.playbooks_directory, self.run_directory)
+            executor = AnsibleExecutor(self.run_directory)
             runner = ActionRunner(
                 self.dag,
                 executor,
