@@ -1,7 +1,9 @@
 import logging
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, PostgresDsn, validator
+from tdp.core.collection import Collection
 
 
 class Settings(BaseSettings):
@@ -58,9 +60,22 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    TDP_COLLECTION_PATH: DirectoryPath
+    TDP_COLLECTION_PATH: str
     TDP_RUN_DIRECTORY: DirectoryPath
     TDP_VARS: DirectoryPath
+
+    TDP_COLLECTIONS: List[Collection] = []
+
+    @validator("TDP_COLLECTIONS", pre=True)
+    def collections_factory(
+        cls, v: Optional[List[Collection]], values: Dict[str, Any]
+    ) -> Any:
+        tdp_collection_path = values.get("TDP_COLLECTION_PATH", "")
+        if not tdp_collection_path:
+            raise ValueError("tdp_collection_path is empty")
+        return [
+            Collection.from_path(path) for path in tdp_collection_path.split(os.pathsep)
+        ]
 
     class Config:
         case_sensitive = True
