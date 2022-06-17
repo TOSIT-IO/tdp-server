@@ -40,12 +40,14 @@ def get_services(
     Returns the list of services
     """
     services = []
-    for service, service_components in dag.services_components.items():
+    for service, service_operations in dag.services_operations.items():
         services.append(
             Service(
                 id=service,
                 components=[
-                    Component(id=component.name) for component in service_components
+                    Component(id=operation.component)
+                    for operation in service_operations
+                    if operation.component
                 ],
                 variables=VariablesCrud.get_variables(service_managers[service]),
             )
@@ -75,10 +77,14 @@ def get_service(
     """
     service_id = service_id.lower()
     try:
-        components = dag.services_components[service_id]
+        operations = dag.services_operations[service_id]
         return Service(
             id=service_id,
-            components=[Component(id=component.name) for component in components],
+            components=[
+                Component(id=operation.component)
+                for operation in operations
+                if operation.component
+            ],
             variables=VariablesCrud.get_variables(service_managers[service_id]),
         )
     except KeyError:

@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 def check_valid_nodes(nodes: Sequence, dag: Dag):
-    difference = set(nodes).difference(dag.components)
+    difference = set(nodes).difference(dag.operations)
     if difference:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

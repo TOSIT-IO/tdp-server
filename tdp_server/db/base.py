@@ -1,1 +1,1 @@
-from tdp.core.models import ActionLog, Base, DeploymentLog, ServiceLog
+from tdp.core.models import Base, DeploymentLog, OperationLog, ServiceLog

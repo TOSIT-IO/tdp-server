@@ -4,8 +4,8 @@ from os import PathLike
 
 from fasteners import InterProcessLock
 from tdp.core.dag import Dag
-from tdp.core.runner.action_runner import ActionRunner
 from tdp.core.runner.ansible_executor import AnsibleExecutor
+from tdp.core.runner.operation_runner import OperationRunner
 from tdp.core.service_manager import ServiceManager
 
 from tdp_server.core.config import settings
@@ -97,7 +97,7 @@ class RunnerProcess(Process):
             if not is_locked:
                 return
             executor = AnsibleExecutor(self.run_directory)
-            runner = ActionRunner(
+            runner = OperationRunner(
                 self.dag,
                 executor,
                 ServiceManager.get_service_managers(self.dag, self.tdp_vars),
