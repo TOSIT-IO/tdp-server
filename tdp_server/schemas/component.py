@@ -2,6 +2,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from tdp_server.schemas.common import (
+    ServiceOrComponentUpdate,
+    ServiceOrComponentUpdateResponse,
+)
 from tdp_server.schemas.variables import Variables
 
 
@@ -22,6 +26,9 @@ class Component(BaseModel):
         }
 
 
-class ComponentUpdate(BaseModel):
-    id: str
-    variables: Variables
+class ComponentUpdate(ServiceOrComponentUpdate):
+    pass
+
+
+class ComponentUpdateResponse(ServiceOrComponentUpdateResponse):
+    pass

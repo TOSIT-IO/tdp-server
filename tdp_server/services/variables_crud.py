@@ -13,8 +13,13 @@ class VariablesCrud:
     ) -> Variables:
         filename: str = name or service_manager.name
         repository = service_manager.repository
-        with repository.open_var_file(filename + ".yml") as configuration:
-            return Variables(__root__=configuration.to_dict())
+        try:
+            with repository.open_var_file(
+                filename + ".yml", fail_if_does_not_exist=True
+            ) as configuration:
+                return Variables(__root__=configuration.to_dict())
+        except ValueError:
+            return Variables(__root__={})
 
     @staticmethod
     def update_variables(
