@@ -78,13 +78,12 @@ def get_service(
     service_id = service_id.lower()
     try:
         operations = dag.services_operations[service_id]
+        components = {
+            operation.component for operation in operations if operation.component
+        }
         return Service(
             id=service_id,
-            components=[
-                Component(id=operation.component)
-                for operation in operations
-                if operation.component
-            ],
+            components=[Component(id=component) for component in components],
             variables=VariablesCrud.get_variables(service_managers[service_id]),
         )
     except KeyError:
