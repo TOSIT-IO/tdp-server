@@ -1,4 +1,4 @@
-from .component import Component, ComponentUpdate
+from .component import Component, ComponentUpdate, ComponentUpdateResponse
 from .deployment import (
     Deployment,
     DeploymentWithOperations,

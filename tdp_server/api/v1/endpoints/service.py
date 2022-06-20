@@ -6,8 +6,7 @@ from tdp.core.dag import Dag
 from tdp.core.service_manager import ServiceManager
 
 from tdp_server.api import dependencies
-from tdp_server.schemas import Component, Service, ServiceUpdate
-from tdp_server.schemas.service import ServiceUpdateResponse
+from tdp_server.schemas import Component, Service, ServiceUpdate, ServiceUpdateResponse
 from tdp_server.services import VariablesCrud
 
 logger = logging.getLogger("tdp_server")
