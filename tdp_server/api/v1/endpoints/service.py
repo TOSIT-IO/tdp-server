@@ -89,7 +89,7 @@ def get_service(
         )
     except KeyError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{service_id} does not exist.",
         )
 
@@ -116,7 +116,7 @@ def patch_service(
         service_manager = service_managers[service_id]
     except KeyError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{service_id} does not exist.",
         )
     update_message = service_update.message + f"\n\nuser: {user}"
@@ -157,7 +157,7 @@ def put_service(
         service_manager = service_managers[service_id]
     except KeyError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{service_id} does not exist.",
         )
     update_message = service_update.message + f"\n\nuser: {user}"
