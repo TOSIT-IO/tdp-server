@@ -24,7 +24,7 @@ COMPONENT_ID_DOES_NOT_EXISTS_ERROR = {
 
 
 @router.get(
-    "/{service_id}/component/{component_id}",
+    "/{component_id}",
     dependencies=[Depends(dependencies.read_protected)],
     response_model=Component,
     responses={
@@ -61,7 +61,7 @@ def get_component(
 
 
 @router.patch(
-    "/{service_id}/component/{component_id}",
+    "/{component_id}",
     response_model=ComponentUpdateResponse,
     responses={**dependencies.COMMON_RESPONSES, **COMPONENT_ID_DOES_NOT_EXISTS_ERROR},
 )
@@ -105,7 +105,7 @@ def patch_component(
 
 
 @router.put(
-    "/{service_id}/component/{component_id}",
+    "/{component_id}",
     response_model=ComponentUpdateResponse,
     responses={**dependencies.COMMON_RESPONSES, **COMPONENT_ID_DOES_NOT_EXISTS_ERROR},
 )
