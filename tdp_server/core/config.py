@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, PostgresDsn, validator
 from tdp.core.collection import Collection
+from tdp.core.collections import Collections
 
 
 class Settings(BaseSettings):
@@ -79,6 +80,8 @@ class Settings(BaseSettings):
                 for path in tdp_collection_path.split(os.pathsep)
             ]
         )
+
+    DO_NOT_USE_IN_PRODUCTION_DISABLE_TOKEN_CHECK: bool = False
 
     class Config:
         case_sensitive = True
