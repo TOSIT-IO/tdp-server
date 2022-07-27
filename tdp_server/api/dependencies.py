@@ -33,7 +33,7 @@ COMMON_RESPONSES = {
     },
 }
 
-DAG = Dag.from_collections(settings.TDP_COLLECTIONS)
+DAG = Dag(settings.TDP_COLLECTIONS)
 EXECUTOR = AnsibleExecutor(settings.TDP_RUN_DIRECTORY)
 RUNNER_SERVICE = RunnerService(
     DAG,

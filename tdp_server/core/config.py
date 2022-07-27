@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     TDP_RUN_DIRECTORY: DirectoryPath
     TDP_VARS: DirectoryPath
 
-    TDP_COLLECTIONS: List[Collection] = []
+    TDP_COLLECTIONS: Collections = Collections({})
 
     @validator("TDP_COLLECTIONS", pre=True)
     def collections_factory(
@@ -73,9 +73,12 @@ class Settings(BaseSettings):
         tdp_collection_path = values.get("TDP_COLLECTION_PATH", "")
         if not tdp_collection_path:
             raise ValueError("tdp_collection_path is empty")
-        return [
-            Collection.from_path(path) for path in tdp_collection_path.split(os.pathsep)
-        ]
+        return Collections.from_collection_list(
+            [
+                Collection.from_path(path)
+                for path in tdp_collection_path.split(os.pathsep)
+            ]
+        )
 
     class Config:
         case_sensitive = True
