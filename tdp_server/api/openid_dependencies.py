@@ -1,3 +1,4 @@
+import logging
 from typing import Mapping, Optional
 
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
@@ -9,9 +10,11 @@ from jose import jwt
 
 from tdp_server.core.config import settings
 
+logger = logging.getLogger("tdp_server")
+
+
 SUPPORTED_ALGORITHMS_KEY = "id_token_signing_alg_values_supported"
 
-# TODO: Gérer la possibilité de se connecter directement à l'API et get l'access token depuis elle ?
 
 authlib_oauth = OAuth()
 authlib_oauth.register(
@@ -45,6 +48,15 @@ async def issuer_public_key(
     oauth_client: StarletteOAuth2App = Depends(get_authlib_client),
 ):
     return await oauth_client.fetch_jwk_set()
+
+
+async def mock_validate_token(
+    security_scopes: SecurityScopes,
+    authorization: Optional[str] = Depends(lambda: None),
+    metadata: dict = Depends(lambda: {}),
+    public_key: str = Depends(lambda: ""),
+) -> Mapping:
+    return {"sub": "fake_user_from_mock_validate_token"}
 
 
 async def validate_token(
@@ -83,3 +95,8 @@ async def validate_token(
                 headers={"WWW-Authenticate": f"Bearer {security_scopes.scope_str}"},
             )
     return token_info
+
+
+if settings.DO_NOT_USE_IN_PRODUCTION_DISABLE_TOKEN_CHECK:
+    logger.warn("Token validation is disabled. Do not do this in production.")
+    validate_token = mock_validate_token
