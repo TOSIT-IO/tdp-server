@@ -38,7 +38,7 @@ def get_url():
     # server = Settings.POSTGRES_SERVER
     # db = Settings.POSTGRES_DB
     # return f"postgresql://{user}:{password}@{server}/{db}"
-    return settings.SQLALCHEMY_DATABASE_URI
+    return settings.DATABASE_DSN
 
 
 def run_migrations_offline():
