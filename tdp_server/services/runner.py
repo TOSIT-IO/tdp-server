@@ -15,6 +15,8 @@ from tdp_server.models import UserDeploymentLog
 DEPLOY_LOCK = InterProcessLock(settings.TDP_RUN_DIRECTORY / ".deploy.lock")
 RUN_LOCK = InterProcessLock(settings.TDP_RUN_DIRECTORY / ".run.lock")
 
+DRY_RUN = settings.MOCK_DEPLOY
+
 
 class StillRunningException(Exception):
     pass
@@ -96,7 +98,7 @@ class RunnerProcess(Process):
             self.send_status_to_parent(is_locked)
             if not is_locked:
                 return
-            executor = AnsibleExecutor(self.run_directory)
+            executor = AnsibleExecutor(self.run_directory, dry=DRY_RUN)
             runner = OperationRunner(
                 self.dag,
                 executor,

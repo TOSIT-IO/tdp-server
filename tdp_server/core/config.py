@@ -66,6 +66,8 @@ class Settings(BaseSettings):
 
     DO_NOT_USE_IN_PRODUCTION_DISABLE_TOKEN_CHECK: bool = False
 
+    MOCK_DEPLOY: bool = False
+
     class Config:
         case_sensitive = True
         env_file = ".env"
