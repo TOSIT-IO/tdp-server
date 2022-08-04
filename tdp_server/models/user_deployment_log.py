@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from tdp_server.db.base import Base
 
@@ -13,4 +13,6 @@ class UserDeploymentLog(Base):
 
     deployment_id = Column(ForeignKey("deployment_log.id"), primary_key=True)
     user = Column(String(length=SUB_MAX_SIZE))
-    deployment = relationship("DeploymentLog")
+    deployment = relationship(
+        "DeploymentLog", backref=backref("user_deployment_log", uselist=False)
+    )
