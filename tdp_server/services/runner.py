@@ -105,10 +105,7 @@ class RunnerProcess(Process):
                 ServiceManager.get_service_managers(self.dag, self.tdp_vars),
             )
             result = runner.run_nodes(*self.args, **self.kwargs)
-            user_deployment_log = UserDeploymentLog(
-                user=self.user,
-            )
-            user_deployment_log.deployment = result
+            user_deployment_log = UserDeploymentLog(user=self.user, deployment=result)
             with SessionLocal() as db:
                 db.add(user_deployment_log)
                 db.commit()

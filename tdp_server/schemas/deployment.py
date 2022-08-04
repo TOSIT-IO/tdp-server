@@ -19,13 +19,14 @@ class DeployStatus(BaseModel):
 
 class Deployment(BaseModel):
     id: int
-    sources: List[str] = []
-    targets: List[str] = []
+    sources: Optional[List[str]] = None
+    targets: Optional[List[str]] = None
     filter: str
     start: datetime
     end: datetime
     state: StateEnum
     operations: List[str]
+    user: str
 
 
 class DeploymentWithOperations(Deployment):
