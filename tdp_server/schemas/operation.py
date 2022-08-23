@@ -6,7 +6,7 @@ from tdp.core.runner.executor import StateEnum
 
 class Operation(BaseModel):
     operation: str
-    start: datetime
-    end: datetime
+    start_time: datetime
+    end_time: datetime
     state: StateEnum
     logs: bytes
