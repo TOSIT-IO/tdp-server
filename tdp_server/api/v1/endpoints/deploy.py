@@ -63,7 +63,7 @@ def deploy_node(
             user=user,
             sources=deploy_request.sources,
             targets=deploy_request.targets,
-            node_filter=deploy_request.filter,
+            node_filter=deploy_request.filter_expression,
         )
     except StillRunningException as e:
         logger.exception(e)

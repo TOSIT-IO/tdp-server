@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -36,9 +36,9 @@ class DeploymentCrud:
                 id=deployment_log.id,
                 sources=deployment_log.sources,
                 targets=deployment_log.targets,
-                filter=deployment_log.filter or "",
-                start=to_utc_datetime(deployment_log.start),
-                end=to_utc_datetime(deployment_log.end),
+                filter_expression=deployment_log.filter_expression,
+                start_time=to_utc_datetime(deployment_log.start_time),
+                end_time=to_utc_datetime(deployment_log.end_time),
                 state=StateEnum(deployment_log.state),
                 operations=[
                     operation.operation for operation in deployment_log.operations
@@ -64,15 +64,15 @@ class DeploymentCrud:
             id=deployment_log.id,
             sources=deployment_log.sources,
             targets=deployment_log.targets,
-            filter=deployment_log.filter or "",
-            start=to_utc_datetime(deployment_log.start),
-            end=to_utc_datetime(deployment_log.end),
+            filter_expression=deployment_log.filter_expression,
+            start_time=to_utc_datetime(deployment_log.start_time),
+            end_time=to_utc_datetime(deployment_log.end_time),
             state=StateEnum(deployment_log.state),
             operations=[
                 Operation(
                     operation=operation_log.operation,
-                    start=to_utc_datetime(operation_log.start),
-                    end=to_utc_datetime(operation_log.end),
+                    start_time=to_utc_datetime(operation_log.start_time),
+                    end_time=to_utc_datetime(operation_log.end_time),
                     state=StateEnum(operation_log.state),
                     logs=operation_log.logs,
                 )
@@ -97,12 +97,14 @@ class DeploymentCrud:
 
         return Operation(
             operation=operation_log.operation,
-            start=to_utc_datetime(operation_log.start),
-            end=to_utc_datetime(operation_log.end),
+            start_time=to_utc_datetime(operation_log.start_time),
+            end_time=to_utc_datetime(operation_log.end_time),
             state=StateEnum(operation_log.state),
             logs=operation_log.logs,
         )
 
 
-def to_utc_datetime(dt: datetime):
-    return dt.replace(tzinfo=timezone.utc)
+def to_utc_datetime(dt: Optional[datetime]):
+    if dt is not None:
+        dt.replace(tzinfo=timezone.utc)
+    return dt

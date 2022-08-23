@@ -48,7 +48,7 @@ class RunnerService:
                 self.run_directory,
                 self.tdp_vars,
                 user,
-                child_conn,
+                child_conn,  # type: ignore
                 *args,
                 **kwargs,
             )
@@ -99,15 +99,26 @@ class RunnerProcess(Process):
             if not is_locked:
                 return
             executor = AnsibleExecutor(self.run_directory, dry=DRY_RUN)
-            runner = OperationRunner(
+            operation_runner = OperationRunner(
                 self.dag,
                 executor,
                 ServiceManager.get_service_managers(self.dag, self.tdp_vars),
             )
-            result = runner.run_nodes(*self.args, **self.kwargs)
-            user_deployment_log = UserDeploymentLog(user=self.user, deployment=result)
-            with SessionLocal() as db:
-                db.add(user_deployment_log)
-                db.commit()
+            with SessionLocal() as session:
+                operation_iterator = operation_runner.run_nodes(
+                    *self.args, **self.kwargs
+                )
+                user_deployment_log = UserDeploymentLog(
+                    user=self.user, deployment=operation_iterator.deployment_log
+                )
+                session.add(user_deployment_log)
+                # insert pending deployment log
+                session.commit()
+                for operation in operation_iterator:
+                    session.add(operation)
+                    session.commit()
+                # notify sqlalchemy deployment log has been updated
+                session.merge(operation_iterator.deployment_log)
+                session.commit()
         finally:
             RUN_LOCK.release()
