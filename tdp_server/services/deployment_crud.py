@@ -16,7 +16,7 @@ NO_USER = "NO_USER_RECORDED"
 def user_or_not(deployment_log) -> str:
     if deployment_log.user_deployment_log is None:
         return NO_USER
-    return deployment_log.user_deployment_log.user
+    return deployment_log.user_deployment_log.user_identifier
 
 
 class DeploymentCrud:
@@ -30,7 +30,6 @@ class DeploymentCrud:
             .offset(offset)
         )
         query_result = db.execute(query).unique().scalars().fetchall()
-        print(query_result)
         return [
             Deployment(
                 id=deployment_log.id,

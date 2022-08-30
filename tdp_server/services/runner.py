@@ -109,7 +109,8 @@ class RunnerProcess(Process):
                     *self.args, **self.kwargs
                 )
                 user_deployment_log = UserDeploymentLog(
-                    user=self.user, deployment=operation_iterator.deployment_log
+                    user_identifier=self.user,
+                    deployment=operation_iterator.deployment_log,
                 )
                 session.add(user_deployment_log)
                 # insert pending deployment log
