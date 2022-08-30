@@ -13,7 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init_script.sql:/docker-entrypoint-initdb.d/init_script.sql
+      - ./init_script.sql:/docker-entrypoint-initdb.d/init_script.sql:Z
 
   pgadmin:
     container_name: pgadmin4_container
@@ -52,7 +52,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: Pa55w0rd
     volumes:
-      - ./configure-keycloak.sh:/entrypoint.sh
+      - ./configure-keycloak.sh:/entrypoint.sh:Z
     depends_on:
       - keycloak
 
