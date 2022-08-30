@@ -12,7 +12,7 @@ class UserDeploymentLog(Base):
     __tablename__ = "user_deployment_log"
 
     deployment_id = Column(ForeignKey("deployment_log.id"), primary_key=True)
-    user = Column(String(length=SUB_MAX_SIZE))
+    user_identifier = Column(String(length=SUB_MAX_SIZE))
     deployment = relationship(
         "DeploymentLog", backref=backref("user_deployment_log", uselist=False)
     )
