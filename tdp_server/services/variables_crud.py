@@ -17,7 +17,7 @@ class VariablesCrud:
             with repository.open_var_file(
                 filename + ".yml", fail_if_does_not_exist=True
             ) as configuration:
-                return Variables(__root__=configuration.to_dict())
+                return Variables(__root__=configuration.copy())
         except ValueError:
             return Variables(__root__={})
 
@@ -37,7 +37,11 @@ class VariablesCrud:
             with repository.validate(update_message) as repo, repo.open_var_file(
                 f"{filename}.yml"
             ) as service_variables:
-                service_variables.update(content, merge)
+                if merge:
+                    service_variables.merge(content)
+                else:
+                    service_variables.clear()
+                    service_variables.update(content)
         except EmptyCommit as e:
             raise ValueError(e)
         return repository.current_version(), update_message
