@@ -1,5 +1,7 @@
 import logging
 import os
+import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, validator
@@ -75,4 +77,20 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-settings = Settings()  # type: ignore
+class TestSettings(Settings):
+    SERVER_NAME = "localhost"
+    SERVER_HOST = AnyHttpUrl("http://localhost", scheme="http")
+    OPENID_CONNECT_DISCOVERY_URL = AnyHttpUrl("http://localhost", scheme="http")
+    OPENID_CLIENT_ID = ""
+    PROJECT_NAME = "test-tdp-server"
+    DATABASE_DSN = "sqlite://"
+    TDP_COLLECTION_PATH = "."
+    TDP_COLLECTIONS: Collections = Collections({})
+    TDP_RUN_DIRECTORY: Path = Path(".none/")
+    TDP_VARS: Path = Path(".none/")
+
+
+if "pytest" in sys.modules:
+    settings = TestSettings.construct()
+else:
+    settings = Settings()  # type: ignore

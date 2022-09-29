@@ -1,8 +1,8 @@
+from functools import lru_cache
 from typing import Dict, Generator
 
-from fastapi import Security
+from fastapi import Depends, Security
 from tdp.core.dag import Dag
-from tdp.core.runner.ansible_executor import AnsibleExecutor
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.openid_dependencies import validate_token
@@ -33,31 +33,29 @@ COMMON_RESPONSES = {
     },
 }
 
-DAG = Dag(settings.TDP_COLLECTIONS)
-EXECUTOR = AnsibleExecutor(settings.TDP_RUN_DIRECTORY)
-RUNNER_SERVICE = RunnerService(
-    DAG,
-    settings.TDP_RUN_DIRECTORY,
-    settings.TDP_VARS,
-)
-CLUSTER_VARIABLES = ClusterVariables.get_cluster_variables(settings.TDP_VARS)
-
 
 def get_db() -> Generator:
     with SessionLocal() as db:
         yield db
 
 
+@lru_cache()
 def get_dag() -> Dag:
-    return DAG
+    return Dag(settings.TDP_COLLECTIONS)
 
 
+@lru_cache()
 def get_cluster_variables() -> ClusterVariables:
-    return CLUSTER_VARIABLES
+    return ClusterVariables.get_cluster_variables(settings.TDP_VARS)
 
 
-def get_runner_service() -> RunnerService:
-    return RUNNER_SERVICE
+@lru_cache()
+def get_runner_service(dag: Dag = Depends(get_dag)) -> RunnerService:
+    return RunnerService(
+        dag,
+        settings.TDP_RUN_DIRECTORY,
+        settings.TDP_VARS,
+    )
 
 
 async def read_protected(
