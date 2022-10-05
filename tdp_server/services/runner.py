@@ -6,7 +6,7 @@ from fasteners import InterProcessLock
 from tdp.core.dag import Dag
 from tdp.core.runner.ansible_executor import AnsibleExecutor
 from tdp.core.runner.operation_runner import OperationRunner
-from tdp.core.service_manager import ServiceManager
+from tdp.core.variables import ClusterVariables
 
 from tdp_server.core.config import settings
 from tdp_server.db.session import SessionLocal
@@ -102,7 +102,7 @@ class RunnerProcess(Process):
             operation_runner = OperationRunner(
                 self.dag,
                 executor,
-                ServiceManager.get_service_managers(self.dag, self.tdp_vars),
+                ClusterVariables.get_cluster_variables(self.tdp_vars),
             )
             with SessionLocal() as session:
                 operation_iterator = operation_runner.run_nodes(

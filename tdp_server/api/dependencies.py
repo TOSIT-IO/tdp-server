@@ -3,7 +3,7 @@ from typing import Dict, Generator
 from fastapi import Security
 from tdp.core.dag import Dag
 from tdp.core.runner.ansible_executor import AnsibleExecutor
-from tdp.core.service_manager import ServiceManager
+from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.openid_dependencies import validate_token
 from tdp_server.core.config import settings
@@ -40,7 +40,7 @@ RUNNER_SERVICE = RunnerService(
     settings.TDP_RUN_DIRECTORY,
     settings.TDP_VARS,
 )
-SERVICE_MANAGERS = ServiceManager.get_service_managers(DAG, settings.TDP_VARS)
+CLUSTER_VARIABLES = ClusterVariables.get_cluster_variables(settings.TDP_VARS)
 
 
 def get_db() -> Generator:
@@ -52,8 +52,8 @@ def get_dag() -> Dag:
     return DAG
 
 
-def get_service_managers() -> Dict[str, ServiceManager]:
-    return SERVICE_MANAGERS
+def get_cluster_variables() -> ClusterVariables:
+    return CLUSTER_VARIABLES
 
 
 def get_runner_service() -> RunnerService:

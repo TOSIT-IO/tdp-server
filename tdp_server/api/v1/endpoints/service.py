@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from tdp.core.dag import Dag
-from tdp.core.service_manager import ServiceManager
+from tdp.core.variables import ClusterVariables
 
 from tdp_server.api import dependencies
 from tdp_server.schemas import Component, Service, ServiceUpdate, ServiceUpdateResponse
@@ -31,9 +31,7 @@ SERVICE_ID_DOES_NOT_EXISTS_ERROR = {
 def get_services(
     *,
     dag: Dag = Depends(dependencies.get_dag),
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
 ) -> Any:
     """
     Returns the list of services
@@ -48,7 +46,7 @@ def get_services(
                     for operation in service_operations
                     if operation.component
                 ],
-                variables=VariablesCrud.get_variables(service_managers[service]),
+                variables=VariablesCrud.get_variables(cluster_variables[service]),
             )
         )
     return services
@@ -67,9 +65,7 @@ def get_service(
     *,
     service_id: str,
     dag: Dag = Depends(dependencies.get_dag),
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
 ) -> Any:
     """
     Gets service identified by its id
@@ -83,7 +79,7 @@ def get_service(
         return Service(
             id=service_id,
             components=[Component(id=component) for component in components],
-            variables=VariablesCrud.get_variables(service_managers[service_id]),
+            variables=VariablesCrud.get_variables(cluster_variables[service_id]),
         )
     except KeyError:
         raise HTTPException(
@@ -101,9 +97,7 @@ def patch_service(
     *,
     service_id: str,
     service_update: ServiceUpdate,
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
     user: str = Depends(dependencies.write_protected),
 ) -> Any:
     """
@@ -111,7 +105,7 @@ def patch_service(
     """
     service_id = service_id.lower()
     try:
-        service_manager = service_managers[service_id]
+        service_manager = cluster_variables[service_id]
     except KeyError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -142,9 +136,7 @@ def put_service(
     *,
     service_id: str,
     service_update: ServiceUpdate,
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
     user: str = Depends(dependencies.write_protected),
 ) -> Any:
     """
@@ -152,7 +144,7 @@ def put_service(
     """
     service_id = service_id.lower()
     try:
-        service_manager = service_managers[service_id]
+        service_manager = cluster_variables[service_id]
     except KeyError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
