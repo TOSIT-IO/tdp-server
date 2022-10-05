@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from tdp.core.service_manager import ServiceManager
+from tdp.core.dag import Dag
+from tdp.core.variables import ClusterVariables
 
 from tdp_server.api import dependencies
 from tdp_server.schemas import Component, ComponentUpdate, ComponentUpdateResponse
@@ -36,9 +37,8 @@ def get_component(
     *,
     service_id: str,
     component_id: str,
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
+    dag: Dag = Depends(dependencies.get_dag),
 ) -> Any:
     """
     Gets component identified by its id
@@ -46,11 +46,11 @@ def get_component(
     service_id = service_id.lower()
     component_id = component_id.lower()
     try:
-        component = service_managers[service_id].get_component_name(component_id)
+        component = cluster_variables[service_id].get_component_name(dag, component_id)
         return Component(
             id=component_id,
             variables=VariablesCrud.get_variables(
-                service_managers[service_id], component
+                cluster_variables[service_id], component
             ),
         )
     except (KeyError, ValueError):
@@ -70,9 +70,8 @@ def patch_component(
     service_id: str,
     component_id: str,
     component_update: ComponentUpdate,
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
+    dag: Dag = Depends(dependencies.get_dag),
     user: str = Depends(dependencies.write_protected),
 ) -> Any:
     """
@@ -80,8 +79,8 @@ def patch_component(
     """
     service_id = service_id.lower()
     try:
-        service_manager = service_managers[service_id]
-        component = service_managers[service_id].get_component_name(component_id)
+        service_manager = cluster_variables[service_id]
+        component = cluster_variables[service_id].get_component_name(dag, component_id)
     except KeyError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -114,9 +113,8 @@ def put_component(
     service_id: str,
     component_id: str,
     component_update: ComponentUpdate,
-    service_managers: Dict[str, ServiceManager] = Depends(
-        dependencies.get_service_managers
-    ),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
+    dag: Dag = Depends(dependencies.get_dag),
     user: str = Depends(dependencies.write_protected),
 ) -> Any:
     """
@@ -124,8 +122,8 @@ def put_component(
     """
     service_id = service_id.lower()
     try:
-        service_manager = service_managers[service_id]
-        component = service_managers[service_id].get_component_name(component_id)
+        service_manager = cluster_variables[service_id]
+        component = cluster_variables[service_id].get_component_name(dag, component_id)
     except KeyError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,7 +1,7 @@
 from typing import Any, Mapping, Optional, Tuple
 
 from tdp.core.repository.repository import EmptyCommit
-from tdp.core.service_manager import ServiceManager
+from tdp.core.variables import ServiceVariables
 
 from tdp_server.schemas import Variables
 
@@ -9,39 +9,31 @@ from tdp_server.schemas import Variables
 class VariablesCrud:
     @staticmethod
     def get_variables(
-        service_manager: ServiceManager, name: Optional[str] = None
+        service_variables: ServiceVariables, name: Optional[str] = None
     ) -> Variables:
-        filename: str = name or service_manager.name
-        repository = service_manager.repository
-        try:
-            with repository.open_var_file(
-                filename + ".yml", fail_if_does_not_exist=True
-            ) as configuration:
-                return Variables(__root__=configuration.copy())
-        except ValueError:
-            return Variables(__root__={})
+        filename: str = name or service_variables.name
+        variables = service_variables.get_variables(filename)
+        return Variables(__root__=variables or {})
 
     @staticmethod
     def update_variables(
-        service_manager: ServiceManager,
+        service_variables: ServiceVariables,
         content: Mapping[str, Any],
         message: str,
         name: Optional[str] = None,
         merge: bool = True,
     ) -> Tuple[str, str]:
-        filename: str = name or service_manager.name
-
-        update_message = f"[{service_manager.name}] {message}"
-        repository = service_manager.repository
+        filename: str = name or service_variables.name
         try:
-            with repository.validate(update_message) as repo, repo.open_var_file(
-                f"{filename}.yml"
-            ) as service_variables:
+            with service_variables.open_var_files(
+                message, [f"{filename}.yml"]
+            ) as configurations:
+                service_configuration = configurations[f"{filename}.yml"]
                 if merge:
-                    service_variables.merge(content)
+                    service_configuration.merge(content)
                 else:
-                    service_variables.clear()
-                    service_variables.update(content)
+                    service_configuration.clear()
+                    service_configuration.update(content)
         except EmptyCommit as e:
             raise ValueError(e)
-        return repository.current_version(), update_message
+        return service_variables.version, message
