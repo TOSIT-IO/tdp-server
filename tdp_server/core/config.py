@@ -2,9 +2,11 @@ import logging
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, DirectoryPath, validator
+from pydantic import AnyHttpUrl, BaseSettings, validator
 from tdp.core.collection import Collection
 from tdp.core.collections import Collections
+
+from tdp_server.core.validator_types import ExistingDir
 
 
 class Settings(BaseSettings):
@@ -45,8 +47,8 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     TDP_COLLECTION_PATH: str
-    TDP_RUN_DIRECTORY: DirectoryPath
-    TDP_VARS: DirectoryPath
+    TDP_RUN_DIRECTORY: ExistingDir
+    TDP_VARS: ExistingDir
 
     TDP_COLLECTIONS: Collections = Collections({})
 
