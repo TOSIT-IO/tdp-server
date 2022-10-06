@@ -20,9 +20,9 @@ fasteners = "0.17.3"
 pytest = "6.2.5"
 requests = "2.27.1"
 black = "21.12b0"
-isort = "4.3.21"
-poetry-githooks = "2.0.0"
+isort = "5.10.1"
 uvicorn = { version = "0.15.0", extras = ["standard"] }
+pre-commit = "2.17.0"
 
 [tool.poetry.extras]
 pg = ["psycopg2"]
@@ -30,9 +30,6 @@ pg = ["psycopg2"]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.githooks]
-pre-commit = "isort --recursive --check-only tdp_server && black --check tdp_server"
 
 [tool.black]
 target-version = ['py36']
