@@ -13,7 +13,8 @@ docker-compose -f dev/docker-compose.yml up -d
 #### Install dependencies, configure, create tables
 ```bash
 poetry install
-poetry run githooks setup
+poetry run pre-commit install --hook-type pre-commit
+poetry run pre-commit install --hook-type commit-msg
 cp dev/.env-dev .env # fill the 3 last variables with the right values
 python tdp_server/initialize_database.py
 ```
