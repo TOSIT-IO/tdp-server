@@ -35,7 +35,7 @@ docker-compose -f dev/docker-compose.yml up -d
    In particular:
 
    - `DATABASE_DSN`: the data source name of the RDBMS.
-   - `TDP_COLLECTION_PATH`: the path to one or more TDP collection, separated by `,` (as [`tdp-collection`](https://github.com/tOSIT-IO/tdp-collection) and [`tdp-collection-extras`](https://github.com/tOSIT-IO/tdp-collection-extras)).
+   - `TDP_COLLECTION_PATH`: the path to one or more TDP collection, separated by `:` (as [`tdp-collection`](https://github.com/TOSIT-IO/tdp-collection) and [`tdp-collection-extras`](https://github.com/TOSIT-IO/tdp-collection-extras)).
    - `TDP_VARS`: the path to an empty directory where the `tdp_vars` will be stored and versioned.
    - `TDP_RUN_DIRECTORY`: the path to the directory where the Ansible command will be launched (as [`tdp-getting-started`](https://github.com/tOSIT-IO/tdp-getting-started) for example).   
    _Note: the `ansible.cfg` file of the working directory must contain the path of the `tdp_vars` directory defined previously._

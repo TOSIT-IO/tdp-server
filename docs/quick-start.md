@@ -34,7 +34,7 @@ For a more feature-rich testing environment, please use the provided [`docker-co
    # tdp-getting-started/ansible.cfg
    [defaults]
    # ...
-   inventory = inventory/hosts,inventory/tdp_vars,../server-deploy/tdp_vars
+   inventory = inventory/hosts,../server-deploy/tdp_vars
    # ...
    ```
 1. Move in the `tdp-server` directory:
