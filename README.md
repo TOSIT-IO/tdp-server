@@ -1,43 +1,88 @@
 # TDP SERVER
 
-## Run TDP Server
+`tdp-server` provides a server to interact with [`tdp-lib`](https://github.com/tOSIT-IO/tdp-lib).
 
-### Preparation
+A full beginers guide to launch a testing server is provided at [`docs/quick-start.md`](./docs/quick-start.md).
 
-#### Start development environment
+## Requirements
+
+The server is made with Python. The following is required:
+
+- [Python](https://www.python.org/) `^3.6`
+- [Poetry](https://python-poetry.org/)
+- A RDBMS, to store deployment history (e.g. [PostgresQL](https://www.postgresql.org/))
+- An identity management system, for authentication purposes (e.g. [Keycloak](https://www.keycloak.org/))
+
+### Dev environment
+
+A dev/testing environment using Keycloak and PostgreSQL is provided through `docker-compose`:
+
 ```bash
-# Start docker services
 docker-compose -f dev/docker-compose.yml up -d
 ```
 
-#### Install dependencies, configure, create tables
-```bash
-poetry install
-poetry run pre-commit install --hook-type pre-commit
-poetry run pre-commit install --hook-type commit-msg
-cp dev/.env-dev .env # fill the 3 last variables with the right values
-python tdp_server/initialize_database.py
-```
+## Installation
 
-### Start server
+1. Use Poetry to download and install the required Python dependencies:
+   ```bash
+   poetry install
+   ```
+1. Define the required environment variables in an `.env` file. An example file is provided in `dev/.env-dev`:
+   ```bash
+   cp dev/.env-dev .env
+   ```
+
+   In particular:
+
+   - `DATABASE_DSN`: the data source name of the RDBMS.
+   - `TDP_COLLECTION_PATH`: the path to one or more TDP collection, separated by `,` (as [`tdp-collection`](https://github.com/tOSIT-IO/tdp-collection) and [`tdp-collection-extras`](https://github.com/tOSIT-IO/tdp-collection-extras)).
+   - `TDP_VARS`: the path to an empty directory where the `tdp_vars` will be stored and versioned.
+   - `TDP_RUN_DIRECTORY`: the path to the directory where the Ansible command will be launched (as [`tdp-getting-started`](https://github.com/tOSIT-IO/tdp-getting-started) for example).   
+   _Note: the `ansible.cfg` file of the working directory must contain the path of the `tdp_vars` directory defined previously._
+1. Initialize the database and the `tdp_vars` directory:
+   ```bash
+   python tdp_server/initialize_database.py
+   python tdp_server/initialize_tdp_vars.py
+   ```
+
+## Usage
+
+Start the server using:
 
 ```bash
 uvicorn tdp_server.main:app --reload
 ```
 
-## Access documentation UIs
+### Accessing the REST API
 
-### OpenAPI UI
+A token must be provided to access the API. Tokens can be obtained using the `get_token.py` script.
 
-http://localhost:8000/docs
-
-### ReDoc UI
-
-http://localhost:8000/redoc
-
-## Access REST API with cURL
+For example, using `curl`:
 
 ```bash
 token=$(python get_token.py)
 curl -H "Authorization: Bearer $token" http://localhost:8000/api/v1/service/
 ```
+
+### Accessing the API documentation pages
+
+Documentation pages of the API are available at:
+
+- OpenAPI UI <http://localhost:8000/docs>
+- ReDoc UI <http://localhost:8000/redoc>
+
+## Contributing
+
+`tdp-server` uses [Git Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to enforce consistency in the code and commit messages.
+
+Use Poetry to install the hooks:
+
+```bash
+poetry run pre-commit install --hook-type pre-commit
+poetry run pre-commit install --hook-type commit-msg
+```
+
+The following environment variables can be used to ease development:
+
+- `DO_NOT_USE_IN_PRODUCTION_DISABLE_TOKEN_CHECK`
+- `MOCK_DEPLOY`
