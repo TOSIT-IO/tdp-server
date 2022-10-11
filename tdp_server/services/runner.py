@@ -1,21 +1,15 @@
-from multiprocessing import Pipe, Process
-from multiprocessing.connection import Connection
-from os import PathLike
+import logging
+from functools import partial
+from pathlib import Path
 
-from fasteners import InterProcessLock
-from tdp.core.dag import Dag
-from tdp.core.runner.ansible_executor import AnsibleExecutor
+from fastapi import BackgroundTasks
+from filelock import FileLock, Timeout
+from sqlalchemy.orm.session import sessionmaker
 from tdp.core.runner.operation_runner import OperationRunner
-from tdp.core.variables import ClusterVariables
 
-from tdp_server.core.config import settings
-from tdp_server.db.session import SessionLocal
 from tdp_server.models import UserDeploymentLog
 
-DEPLOY_LOCK = InterProcessLock(settings.TDP_RUN_DIRECTORY / ".deploy.lock")
-RUN_LOCK = InterProcessLock(settings.TDP_RUN_DIRECTORY / ".run.lock")
-
-DRY_RUN = settings.MOCK_DEPLOY
+logger = logging.getLogger("tdp_server")
 
 
 class StillRunningException(Exception):
@@ -25,91 +19,44 @@ class StillRunningException(Exception):
 class RunnerService:
     def __init__(
         self,
-        dag: Dag,
-        run_directory: PathLike,
-        tdp_vars: PathLike,
+        operation_runner: OperationRunner,
+        lock_dir: Path,
     ):
-        self.dag = dag
-        self.run_directory = run_directory
-        self.tdp_vars = tdp_vars
-        self.process = None
+        self.operation_runner = operation_runner
+        # Timeout 0 makes it non blocking on every `acquire` call
+        self._file_lock = partial(FileLock, lock_dir / ".deploy.lock", timeout=0)
 
-    def run_nodes(self, user, *args, **kwargs):
-        is_locked = DEPLOY_LOCK.acquire(blocking=False)
-        if not is_locked:
-            raise StillRunningException("Failed to lock for deployment")
+    def run_nodes(
+        self,
+        background_tasks: BackgroundTasks,
+        session_local: sessionmaker,
+        user: str,
+        *args,
+        **kwargs,
+    ):
+        lock = self._file_lock()
         try:
-            if self.process:
-                if self.process.is_alive():
-                    raise StillRunningException("run_nodes is still running")
-            parent_conn, child_conn = Pipe()
-            self.process = RunnerProcess(
-                self.dag,
-                self.run_directory,
-                self.tdp_vars,
-                user,
-                child_conn,  # type: ignore
+            lock.acquire()
+            background_tasks.add_task(
+                partial(self._background_run_node, session_local, lock, user),
                 *args,
                 **kwargs,
             )
-            self.process.start()
-            result = parent_conn.recv()
-            parent_conn.close()
-            if result != 0:
-                raise StillRunningException(
-                    "RunnerProcess failed to lock for execution"
-                )
-        finally:
-            DEPLOY_LOCK.release()
+        except Timeout as e:
+            raise StillRunningException("Failed to lock process for deployment") from e
+        except Exception as e:
+            if lock.is_locked:
+                lock.release()
+            raise e
 
-    @property
-    def running(self) -> bool:
-        return not self.process is None and self.process.is_alive()
-
-
-class RunnerProcess(Process):
-    def __init__(
-        self,
-        dag: Dag,
-        run_directory: PathLike,
-        tdp_vars: PathLike,
-        user: str,
-        child_conn: Connection,
-        *args,
-        **kwargs,
-    ) -> None:
-        super(RunnerProcess, self).__init__()
-        self.dag = dag
-        self.run_directory = run_directory
-        self.tdp_vars = tdp_vars
-        self.user = user
-        self.child_conn = child_conn
-        self.args = args
-        self.kwargs = kwargs
-
-    def send_status_to_parent(self, is_locked):
-        status = 0 if is_locked else 1
-        self.child_conn.send(status)
-        self.child_conn.close()
-
-    def run(self):
-        is_locked = RUN_LOCK.acquire(blocking=False)
+    def _background_run_node(
+        self, session_local: sessionmaker, lock: FileLock, user: str, *args, **kwargs
+    ):
         try:
-            self.send_status_to_parent(is_locked)
-            if not is_locked:
-                return
-            executor = AnsibleExecutor(self.run_directory, dry=DRY_RUN)
-            operation_runner = OperationRunner(
-                self.dag,
-                executor,
-                ClusterVariables.get_cluster_variables(self.tdp_vars),
-            )
-            with SessionLocal() as session:
-                operation_iterator = operation_runner.run_nodes(
-                    *self.args, **self.kwargs
-                )
+            with session_local() as session:
+                operation_iterator = self.operation_runner.run_nodes(*args, **kwargs)
                 user_deployment_log = UserDeploymentLog(
-                    user_identifier=self.user,
+                    user_identifier=user,
                     deployment=operation_iterator.deployment_log,
                 )
                 session.add(user_deployment_log)
@@ -121,5 +68,16 @@ class RunnerProcess(Process):
                 # notify sqlalchemy deployment log has been updated
                 session.merge(operation_iterator.deployment_log)
                 session.commit()
+        except Exception as e:
+            logger.exception(e)
         finally:
-            RUN_LOCK.release()
+            lock.release()
+
+    @property
+    def running(self) -> bool:
+        try:
+            lock = self._file_lock()
+            with lock.acquire():
+                return False
+        except Timeout:
+            return True

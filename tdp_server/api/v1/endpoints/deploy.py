@@ -1,11 +1,12 @@
 import logging
 from typing import Any, List, Sequence
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
 from tdp.core.dag import Dag
 
 from tdp_server.api import dependencies
+from tdp_server.db.session import SessionLocal
 from tdp_server.schemas import (
     Deployment,
     DeploymentWithOperations,
@@ -49,9 +50,10 @@ def deploy_node(
     dag: Dag = Depends(dependencies.get_dag),
     user: str = Depends(dependencies.execute_protected),
     runner_service: RunnerService = Depends(dependencies.get_runner_service),
+    background_tasks: BackgroundTasks,
 ) -> Any:
     """
-    Returns the list of services
+    Launches a deployment from the dag
     """
     if deploy_request.targets:
         check_valid_nodes(deploy_request.targets, dag)
@@ -60,6 +62,8 @@ def deploy_node(
 
     try:
         runner_service.run_nodes(
+            background_tasks=background_tasks,
+            session_local=SessionLocal,
             user=user,
             sources=deploy_request.sources,
             targets=deploy_request.targets,
@@ -70,6 +74,12 @@ def deploy_node(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="another deployment is still running",
+        )
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="check server logs to investigate error",
         )
     return {"message": "deployment launched"}
 
