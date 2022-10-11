@@ -14,7 +14,7 @@ psycopg2 = { version ="2.9.3", optional = true}
 Authlib = "1.0.0"
 httpx = "0.22.0"
 python-jose = { version = "3.3.0", extras = ["cryptography"] }
-fasteners = "0.17.3"
+filelock = "3.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"

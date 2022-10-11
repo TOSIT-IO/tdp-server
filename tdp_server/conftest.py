@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Tuple
 
 import pytest
 import yaml
@@ -11,11 +11,10 @@ from tdp.core.collections import Collections
 from tdp.core.dag import Dag
 from tdp.core.variables import ClusterVariables
 
-from tdp_server.api.dependencies import get_cluster_variables, get_dag
 from tdp_server.api.openid_dependencies import mock_validate_token, validate_token
+from tdp_server.app import create_app
 from tdp_server.core.config import settings
 from tdp_server.db.base import Base
-from tdp_server.main import create_app
 
 MOCK_SERVICE_DAG = [
     {"name": "mock_node_install", "depends_on": []},
@@ -67,10 +66,13 @@ def mock_runtime(
     runtime = tmp_path_factory.mktemp("runtime")
 
     tdp_vars = runtime / "tdp_vars"
+    tdp_run_dir = runtime / "run"
 
     tdp_vars.mkdir()
+    tdp_run_dir.mkdir()
 
-    settings.TDP_VARS = tdp_vars
+    settings.TDP_VARS = tdp_vars  # type: ignore
+    settings.TDP_RUN_DIRECTORY = tdp_run_dir  # type: ignore
     settings.TDP_COLLECTION_PATH = str(minimal_collection.absolute())
     settings.TDP_COLLECTIONS = Collections.from_collection_list(
         [Collection.from_path(settings.TDP_COLLECTION_PATH)]
@@ -86,15 +88,11 @@ def mock_runtime(
 
 @pytest.fixture
 def app(mock_runtime):
-    app = create_app()
-
     dag, cluster_variables = mock_runtime
+    app = create_app(dag, cluster_variables)
 
     # Disable token validation for tests
     app.dependency_overrides[validate_token] = mock_validate_token
-
-    app.dependency_overrides[get_dag] = lambda: dag
-    app.dependency_overrides[get_cluster_variables] = lambda: cluster_variables
     return app
 
 

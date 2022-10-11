@@ -1,10 +1,9 @@
 import logging
 from typing import Callable
 
-from fastapi import FastAPI, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request, Response
 
-from tdp_server.api.v1.api import api_router
+from tdp_server.app import create_app
 from tdp_server.core.config import settings
 from tdp_server.core.log_config import init_loggers
 
@@ -12,24 +11,6 @@ init_loggers()
 
 logger = logging.getLogger("tdp_server")
 logger.setLevel(settings.LOG_LEVEL)
-
-
-def create_app() -> FastAPI:
-
-    app = FastAPI(
-        title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
-    )
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.include_router(api_router, prefix=settings.API_V1_STR)
-    return app
-
 
 app = create_app()
 

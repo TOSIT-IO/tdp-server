@@ -1,8 +1,8 @@
-from functools import lru_cache
-from typing import Dict, Generator
+from typing import Generator
 
-from fastapi import Depends, Security
+from fastapi import Request, Security
 from tdp.core.dag import Dag
+from tdp.core.runner.operation_runner import OperationRunner
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.openid_dependencies import validate_token
@@ -39,23 +39,20 @@ def get_db() -> Generator:
         yield db
 
 
-@lru_cache()
-def get_dag() -> Dag:
-    return Dag(settings.TDP_COLLECTIONS)
+def get_dag(request: Request) -> Dag:
+    return request.app.state.dag
 
 
-@lru_cache()
-def get_cluster_variables() -> ClusterVariables:
-    return ClusterVariables.get_cluster_variables(settings.TDP_VARS)
+def get_cluster_variables(request: Request) -> ClusterVariables:
+    return request.app.state.cluster_variables
 
 
-@lru_cache()
-def get_runner_service(dag: Dag = Depends(get_dag)) -> RunnerService:
-    return RunnerService(
-        dag,
-        settings.TDP_RUN_DIRECTORY,
-        settings.TDP_VARS,
-    )
+def get_operation_runner(request: Request) -> OperationRunner:
+    return request.app.state.operation_runner
+
+
+def get_runner_service(request: Request) -> RunnerService:
+    return request.app.state.runner_service
 
 
 async def read_protected(
