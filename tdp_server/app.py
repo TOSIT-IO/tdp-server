@@ -3,9 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tdp.core.dag import Dag
-from tdp.core.runner.ansible_executor import AnsibleExecutor
-from tdp.core.runner.executor import Executor
-from tdp.core.runner.operation_runner import OperationRunner
+from tdp.core.runner import AnsibleExecutor, DeploymentRunner, Executor
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.v1.api import api_router
@@ -17,7 +15,7 @@ def create_app(
     dag: Optional[Dag] = None,
     cluster_variables: Optional[ClusterVariables] = None,
     executor: Optional[Executor] = None,
-    operation_runner: Optional[OperationRunner] = None,
+    deployment_runner: Optional[DeploymentRunner] = None,
     runner_service: Optional[RunnerService] = None,
 ) -> FastAPI:
 
@@ -43,16 +41,18 @@ def create_app(
     if executor is None:
         executor = AnsibleExecutor(settings.TDP_RUN_DIRECTORY, settings.MOCK_DEPLOY)
 
-    if operation_runner is None:
-        operation_runner = OperationRunner(dag, executor, cluster_variables)
+    if deployment_runner is None:
+        deployment_runner = DeploymentRunner(
+            settings.TDP_COLLECTIONS, executor, cluster_variables
+        )
 
     if runner_service is None:
-        runner_service = RunnerService(operation_runner, settings.TDP_RUN_DIRECTORY)
+        runner_service = RunnerService(deployment_runner, settings.TDP_RUN_DIRECTORY)
 
     app.state.dag = dag
     app.state.cluster_variables = cluster_variables
     app.state.executor = executor
-    app.state.operation_runner = operation_runner
+    app.state.deployment_runner = deployment_runner
     app.state.runner_service = runner_service
 
     return app

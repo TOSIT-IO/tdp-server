@@ -4,10 +4,20 @@ from pathlib import Path
 
 from fastapi import BackgroundTasks
 from filelock import FileLock, Timeout
-from sqlalchemy.orm.session import sessionmaker
-from tdp.core.runner.operation_runner import OperationRunner
+from sqlalchemy.orm.session import Session, sessionmaker
+from starlette.concurrency import run_in_threadpool
+from tdp.core.dag import Dag
+from tdp.core.runner import (
+    DeploymentIterator,
+    DeploymentPlan,
+    DeploymentRunner,
+    EmptyDeploymentPlanError,
+)
 
 from tdp_server.models import UserDeploymentLog
+from tdp_server.schemas import Deployment, DeployRequest
+
+from .utils import deployment_from_deployment_log
 
 logger = logging.getLogger("tdp_server")
 
@@ -19,29 +29,47 @@ class StillRunningException(Exception):
 class RunnerService:
     def __init__(
         self,
-        operation_runner: OperationRunner,
+        deployment_runner: DeploymentRunner,
         lock_dir: Path,
     ):
-        self.operation_runner = operation_runner
+        self.deployment_runner = deployment_runner
         # Timeout 0 makes it non blocking on every `acquire` call
         self._file_lock = partial(FileLock, lock_dir / ".deploy.lock", timeout=0)
 
-    def run_nodes(
+    async def make_deployment_plan(
+        self, dag: Dag, deploy_request: DeployRequest
+    ) -> DeploymentPlan:
+        deployment_arguments = {} if deploy_request is None else deploy_request.dict()
+        try:
+            deployment_plan = await run_in_threadpool(
+                DeploymentPlan.from_dag, dag, **deployment_arguments
+            )
+        except EmptyDeploymentPlanError as e:
+            raise ValueError(e) from e
+        return deployment_plan
+
+    async def run(
         self,
         background_tasks: BackgroundTasks,
         session_local: sessionmaker,
         user: str,
-        *args,
-        **kwargs,
-    ):
+        deployment_plan: DeploymentPlan,
+    ) -> Deployment:
         lock = self._file_lock()
         try:
             lock.acquire()
-            background_tasks.add_task(
-                partial(self._background_run_node, session_local, lock, user),
-                *args,
-                **kwargs,
+            session = session_local()
+            deployment_iterator = await self._get_deployment_iterator_and_insert_in_db(
+                session, user, deployment_plan
             )
+            deployment = deployment_from_deployment_log(deployment_iterator.log, user)
+            background_tasks.add_task(
+                self._background_iterate_operations,
+                session,
+                lock,
+                deployment_iterator,
+            )
+            return deployment
         except Timeout as e:
             raise StillRunningException("Failed to lock process for deployment") from e
         except Exception as e:
@@ -49,28 +77,44 @@ class RunnerService:
                 lock.release()
             raise e
 
-    def _background_run_node(
-        self, session_local: sessionmaker, lock: FileLock, user: str, *args, **kwargs
+    async def _get_deployment_iterator_and_insert_in_db(
+        self, session: Session, user: str, deployment_plan: DeploymentPlan
+    ) -> DeploymentIterator:
+        deployment_iterator = await run_in_threadpool(
+            self.deployment_runner.run, deployment_plan
+        )
+        user_deployment_log = UserDeploymentLog(
+            user_identifier=user,
+            deployment=deployment_iterator.log,
+        )
+        session.add(user_deployment_log)
+        # insert pending deployment log
+        session.commit()
+        return deployment_iterator
+
+    def _background_iterate_operations(
+        self,
+        session: Session,
+        lock: FileLock,
+        deployment_iterator: DeploymentIterator,
     ):
         try:
-            with session_local() as session:
-                operation_iterator = self.operation_runner.run_nodes(*args, **kwargs)
-                user_deployment_log = UserDeploymentLog(
-                    user_identifier=user,
-                    deployment=operation_iterator.deployment_log,
-                )
-                session.add(user_deployment_log)
-                # insert pending deployment log
+            for operation_log, service_component_log in deployment_iterator:
+                session.add(operation_log)
+                if service_component_log is not None:
+                    session.add(service_component_log)
                 session.commit()
-                for operation in operation_iterator:
-                    session.add(operation)
-                    session.commit()
-                # notify sqlalchemy deployment log has been updated
-                session.merge(operation_iterator.deployment_log)
-                session.commit()
+            # notify sqlalchemy deployment log has been updated
+            session.merge(deployment_iterator.log)
+            session.commit()
         except Exception as e:
             logger.exception(e)
         finally:
+            try:
+                session.close()
+            except:
+                # exception will log information about context exception
+                logger.exception("Failed to close session")
             lock.release()
 
     @property
