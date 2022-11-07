@@ -1,14 +1,14 @@
-from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from tdp.core.runner.executor import StateEnum
 
 from tdp_server.db.base import DeploymentLog, OperationLog
 from tdp_server.models import UserDeploymentLog
 from tdp_server.schemas import Deployment, DeploymentWithOperations, Operation
+
+from .utils import to_optional_utc_datetime, to_utc_datetime
 
 NO_USER = "NO_USER_RECORDED"
 
@@ -37,8 +37,9 @@ class DeploymentCrud:
                 targets=deployment_log.targets,
                 filter_expression=deployment_log.filter_expression,
                 start_time=to_utc_datetime(deployment_log.start_time),
-                end_time=to_utc_datetime(deployment_log.end_time),
-                state=StateEnum(deployment_log.state),
+                end_time=to_optional_utc_datetime(deployment_log.end_time),
+                restart=deployment_log.restart,
+                state=deployment_log.state,
                 operations=[
                     operation.operation for operation in deployment_log.operations
                 ],
@@ -65,14 +66,15 @@ class DeploymentCrud:
             targets=deployment_log.targets,
             filter_expression=deployment_log.filter_expression,
             start_time=to_utc_datetime(deployment_log.start_time),
-            end_time=to_utc_datetime(deployment_log.end_time),
-            state=StateEnum(deployment_log.state),
+            end_time=to_optional_utc_datetime(deployment_log.end_time),
+            restart=deployment_log.restart,
+            state=deployment_log.state,
             operations=[
                 Operation(
                     operation=operation_log.operation,
                     start_time=to_utc_datetime(operation_log.start_time),
                     end_time=to_utc_datetime(operation_log.end_time),
-                    state=StateEnum(operation_log.state),
+                    state=operation_log.state,
                     logs=operation_log.logs,
                 )
                 for operation_log in deployment_log.operations
@@ -98,12 +100,6 @@ class DeploymentCrud:
             operation=operation_log.operation,
             start_time=to_utc_datetime(operation_log.start_time),
             end_time=to_utc_datetime(operation_log.end_time),
-            state=StateEnum(operation_log.state),
+            state=operation_log.state,
             logs=operation_log.logs,
         )
-
-
-def to_utc_datetime(dt: Optional[datetime]):
-    if dt is not None:
-        dt.replace(tzinfo=timezone.utc)
-    return dt

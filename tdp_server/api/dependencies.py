@@ -2,7 +2,7 @@ from typing import Generator
 
 from fastapi import Request, Security
 from tdp.core.dag import Dag
-from tdp.core.runner.operation_runner import OperationRunner
+from tdp.core.runner import DeploymentRunner
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.openid_dependencies import validate_token
@@ -47,8 +47,8 @@ def get_cluster_variables(request: Request) -> ClusterVariables:
     return request.app.state.cluster_variables
 
 
-def get_operation_runner(request: Request) -> OperationRunner:
-    return request.app.state.operation_runner
+def get_deployment_runner(request: Request) -> DeploymentRunner:
+    return request.app.state.deployment_runner
 
 
 def get_runner_service(request: Request) -> RunnerService:

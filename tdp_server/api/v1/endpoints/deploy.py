@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Sequence
+from typing import Any, List, Optional, Sequence
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
@@ -44,14 +44,14 @@ def check_valid_nodes(nodes: Sequence, dag: Dag):
     },
     status_code=status.HTTP_202_ACCEPTED,
 )
-def deploy_node(
+async def deploy_node(
     *,
     deploy_request: DeployRequest = DeployRequest(),
     dag: Dag = Depends(dependencies.get_dag),
     user: str = Depends(dependencies.execute_protected),
     runner_service: RunnerService = Depends(dependencies.get_runner_service),
     background_tasks: BackgroundTasks,
-) -> Any:
+) -> Deployment:
     """
     Launches a deployment from the dag
     """
@@ -61,14 +61,19 @@ def deploy_node(
         check_valid_nodes(deploy_request.sources, dag)
 
     try:
-        runner_service.run_nodes(
+        deployment_plan = await runner_service.make_deployment_plan(dag, deploy_request)
+    except ValueError as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    try:
+        return await runner_service.run(
             background_tasks=background_tasks,
             session_local=SessionLocal,
             user=user,
-            sources=deploy_request.sources,
-            targets=deploy_request.targets,
-            filter_expression=deploy_request.filter_expression,
+            deployment_plan=deployment_plan,
         )
+
     except StillRunningException as e:
         logger.exception(e)
         raise HTTPException(
@@ -81,7 +86,6 @@ def deploy_node(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="check server logs to investigate error",
         )
-    return {"message": "deployment launched"}
 
 
 @router.get(

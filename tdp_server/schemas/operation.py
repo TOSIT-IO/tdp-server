@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
-from tdp.core.runner.executor import StateEnum
+from tdp.core.models import StateEnum
 
 
 class Operation(BaseModel):
