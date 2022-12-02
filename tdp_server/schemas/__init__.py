@@ -5,6 +5,6 @@ from .deployment import (
     DeployRequest,
     DeployStatus,
 )
-from .operation import Operation
+from .operation import Operation, OperationLog
 from .service import Service, ServiceUpdate, ServiceUpdateResponse
 from .variables import Variables

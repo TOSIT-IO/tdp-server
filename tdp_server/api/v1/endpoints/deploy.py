@@ -12,7 +12,7 @@ from tdp_server.schemas import (
     DeploymentWithOperations,
     DeployRequest,
     DeployStatus,
-    Operation,
+    OperationLog,
 )
 from tdp_server.services import DeploymentCrud, RunnerService, StillRunningException
 
@@ -139,7 +139,7 @@ def get_deployment(
 @router.get(
     "/{deployment_id}/operation/{operation}",
     dependencies=[Depends(dependencies.read_protected)],
-    response_model=Operation,
+    response_model=OperationLog,
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployment_operation(

@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, validator
 from tdp.core.models import FilterTypeEnum, StateEnum
 
-from tdp_server.schemas.operation import Operation
+from tdp_server.schemas.operation import OperationLog
 
 
 class DeployRequest(BaseModel):
@@ -62,4 +62,4 @@ class Deployment(BaseModel):
 
 
 class DeploymentWithOperations(Deployment):
-    operations: List[Operation]
+    operations: List[OperationLog]
