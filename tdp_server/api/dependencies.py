@@ -1,6 +1,7 @@
 from typing import Generator
 
 from fastapi import Request, Security
+from tdp.core.collections import Collections
 from tdp.core.dag import Dag
 from tdp.core.runner import DeploymentRunner
 from tdp.core.variables import ClusterVariables
@@ -49,6 +50,10 @@ def get_cluster_variables(request: Request) -> ClusterVariables:
 
 def get_deployment_runner(request: Request) -> DeploymentRunner:
     return request.app.state.deployment_runner
+
+
+def get_collections(request: Request) -> Collections:
+    return request.app.state.settings.TDP_COLLECTIONS
 
 
 def get_runner_service(request: Request) -> RunnerService:
