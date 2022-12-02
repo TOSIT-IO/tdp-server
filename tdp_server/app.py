@@ -48,7 +48,7 @@ def create_app(
 
     if runner_service is None:
         runner_service = RunnerService(deployment_runner, settings.TDP_RUN_DIRECTORY)
-
+    app.state.settings = settings
     app.state.dag = dag
     app.state.cluster_variables = cluster_variables
     app.state.executor = executor

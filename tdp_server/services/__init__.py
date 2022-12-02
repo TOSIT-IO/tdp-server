@@ -1,4 +1,5 @@
 from .deployment_crud import DeploymentCrud
+from .operations import Operations
 from .runner import RunnerService, StillRunningException
 from .utils import (
     deployment_from_deployment_log,
