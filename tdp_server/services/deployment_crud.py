@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import Session
 
 from tdp_server.db.base import DeploymentLog, OperationLog
 from tdp_server.models import UserDeploymentLog
-from tdp_server.schemas import Deployment, DeploymentWithOperations, Operation
+from tdp_server.schemas import Deployment, DeploymentWithOperations, OperationLog
 
 from .utils import to_optional_utc_datetime, to_utc_datetime
 
@@ -70,7 +70,7 @@ class DeploymentCrud:
             restart=deployment_log.restart,
             state=deployment_log.state,
             operations=[
-                Operation(
+                OperationLog(
                     operation=operation_log.operation,
                     start_time=to_utc_datetime(operation_log.start_time),
                     end_time=to_utc_datetime(operation_log.end_time),
@@ -85,7 +85,7 @@ class DeploymentCrud:
     @staticmethod
     def get_deployment_operation(
         db: Session, deployment_id: int, operation: str
-    ) -> Operation:
+    ) -> OperationLog:
         query = (
             select(OperationLog)
             .where(OperationLog.deployment_id == deployment_id)
@@ -96,7 +96,7 @@ class DeploymentCrud:
         except NoResultFound:
             raise ValueError("Invalid deployment id or operation name")
 
-        return Operation(
+        return OperationLog(
             operation=operation_log.operation,
             start_time=to_utc_datetime(operation_log.start_time),
             end_time=to_utc_datetime(operation_log.end_time),
