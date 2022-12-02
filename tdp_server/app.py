@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from tdp.core.dag import Dag
 from tdp.core.runner import AnsibleExecutor, DeploymentRunner, Executor
 from tdp.core.variables import ClusterVariables
@@ -30,6 +31,8 @@ def create_app(
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(GZipMiddleware)
+
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
     if dag is None:
