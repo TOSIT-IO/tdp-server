@@ -58,14 +58,18 @@ class RunnerService:
         lock = self._file_lock()
         try:
             lock.acquire()
-            session = session_local()
-            deployment_iterator = await self._get_deployment_iterator_and_insert_in_db(
-                session, user, deployment_plan
-            )
-            deployment = deployment_from_deployment_log(deployment_iterator.log, user)
+            with session_local() as session:
+                deployment_iterator = (
+                    await self._get_deployment_iterator_and_insert_in_db(
+                        session, user, deployment_plan
+                    )
+                )
+                deployment = deployment_from_deployment_log(
+                    deployment_iterator.log, user
+                )
             background_tasks.add_task(
                 self._background_iterate_operations,
-                session,
+                session_local,
                 lock,
                 deployment_iterator,
             )
@@ -94,27 +98,23 @@ class RunnerService:
 
     def _background_iterate_operations(
         self,
-        session: Session,
+        session_local: sessionmaker,
         lock: FileLock,
         deployment_iterator: DeploymentIterator,
     ):
         try:
-            for operation_log, service_component_log in deployment_iterator:
-                session.add(operation_log)
-                if service_component_log is not None:
-                    session.add(service_component_log)
+            with session_local() as session:
+                for operation_log, service_component_log in deployment_iterator:
+                    session.add(operation_log)
+                    if service_component_log is not None:
+                        session.add(service_component_log)
+                    session.commit()
+                # notify sqlalchemy deployment log has been updated
+                session.merge(deployment_iterator.log)
                 session.commit()
-            # notify sqlalchemy deployment log has been updated
-            session.merge(deployment_iterator.log)
-            session.commit()
         except Exception as e:
             logger.exception(e)
         finally:
-            try:
-                session.close()
-            except:
-                # exception will log information about context exception
-                logger.exception("Failed to close session")
             lock.release()
 
     @property
