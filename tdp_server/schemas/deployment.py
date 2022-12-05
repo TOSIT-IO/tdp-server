@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
-from tdp.core.models import FilterTypeEnum, StateEnum
+from tdp.core.models import FilterTypeEnum
+from tdp.core.models import OperationLog as tdp_OperationLog
+from tdp.core.models import StateEnum
 
 from tdp_server.schemas.operation import OperationLog
 
@@ -58,8 +60,38 @@ class DeploymentLog(BaseModel):
     restart: bool = False
     state: StateEnum
     operations: List[str]
-    user: str
+    user: Optional[str] = "NO_USER_RECORDED"
+
+    class Config:
+        orm_mode = True
+
+    @validator("operations", each_item=True, pre=True)
+    def validate_operations(cls, operation, values):
+        if isinstance(operation, str):
+            return operation
+        if isinstance(operation, tdp_OperationLog):
+            return operation.operation
+        raise ValueError(f"Invalid type: {type(operation)}")
+
+    @validator("user")
+    def validate_user(cls, user, values):
+        if user is None:
+            return "NO_USER_RECORDED"
+        return user
+
+    @validator("start_time", "end_time")
+    def validate_datetimes(cls, dt, values):
+        if dt is not None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
 
 
 class DeploymentLogWithOperations(DeploymentLog):
     operations: List[OperationLog]
+
+    class Config:
+        orm_mode = True
+
+    @validator("operations", pre=True)
+    def validate_operations(cls, operations, values):
+        return operations

@@ -9,15 +9,7 @@ from tdp_server.db.base import OperationLog as tdp_OperationLog
 from tdp_server.models import UserDeploymentLog
 from tdp_server.schemas import DeploymentLog, DeploymentLogWithOperations, OperationLog
 
-from .utils import to_optional_utc_datetime, to_utc_datetime
-
-NO_USER = "NO_USER_RECORDED"
-
-
-def user_or_not(deployment_log) -> str:
-    if deployment_log.user_deployment_log is None:
-        return NO_USER
-    return deployment_log.user_deployment_log.user_identifier
+from .utils import parse_deployment_log
 
 
 class DeploymentCrud:
@@ -31,21 +23,9 @@ class DeploymentCrud:
             .offset(offset)
         )
         query_result = db.execute(query).unique().scalars().fetchall()
+
         return [
-            DeploymentLog(
-                id=deployment_log.id,
-                sources=deployment_log.sources,
-                targets=deployment_log.targets,
-                filter_expression=deployment_log.filter_expression,
-                start_time=to_utc_datetime(deployment_log.start_time),
-                end_time=to_optional_utc_datetime(deployment_log.end_time),
-                restart=deployment_log.restart,
-                state=deployment_log.state,
-                operations=[
-                    operation.operation for operation in deployment_log.operations
-                ],
-                user=user_or_not(deployment_log),
-            )
+            parse_deployment_log(deployment_log, DeploymentLog)
             for deployment_log in query_result
         ]
 
@@ -60,28 +40,10 @@ class DeploymentCrud:
             deployment_log = db.execute(query).scalar_one()
         except NoResultFound:
             raise ValueError("Invalid deployment id")
-
-        return DeploymentLogWithOperations(
-            id=deployment_log.id,
-            sources=deployment_log.sources,
-            targets=deployment_log.targets,
-            filter_expression=deployment_log.filter_expression,
-            start_time=to_utc_datetime(deployment_log.start_time),
-            end_time=to_optional_utc_datetime(deployment_log.end_time),
-            restart=deployment_log.restart,
-            state=deployment_log.state,
-            operations=[
-                OperationLog(
-                    operation=operation_log.operation,
-                    start_time=to_utc_datetime(operation_log.start_time),
-                    end_time=to_utc_datetime(operation_log.end_time),
-                    state=operation_log.state,
-                    logs=operation_log.logs,
-                )
-                for operation_log in deployment_log.operations
-            ],
-            user=user_or_not(deployment_log),
+        deployment_schema = parse_deployment_log(
+            deployment_log, DeploymentLogWithOperations
         )
+        return deployment_schema
 
     @staticmethod
     def get_deployment_operation(
@@ -97,10 +59,4 @@ class DeploymentCrud:
         except NoResultFound:
             raise ValueError("Invalid deployment id or operation name")
 
-        return OperationLog(
-            operation=operation_log.operation,
-            start_time=to_utc_datetime(operation_log.start_time),
-            end_time=to_utc_datetime(operation_log.end_time),
-            state=operation_log.state,
-            logs=operation_log.logs,
-        )
+        return OperationLog.from_orm(operation_log)

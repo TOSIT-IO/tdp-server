@@ -6,18 +6,16 @@ from fastapi import BackgroundTasks
 from filelock import FileLock, Timeout
 from sqlalchemy.orm.session import Session, sessionmaker
 from starlette.concurrency import run_in_threadpool
-from tdp.core.dag import Dag
 from tdp.core.runner import (
     DeploymentIterator,
     DeploymentPlan,
     DeploymentRunner,
-    EmptyDeploymentPlanError,
 )
 
 from tdp_server.models import UserDeploymentLog
-from tdp_server.schemas import DeploymentLog, DeployRequest
+from tdp_server.schemas import DeploymentLog
 
-from .utils import deployment_from_deployment_log
+from .utils import parse_deployment_log
 
 logger = logging.getLogger("tdp_server")
 
@@ -52,8 +50,8 @@ class RunnerService:
                         session, user, deployment_plan
                     )
                 )
-                deployment = deployment_from_deployment_log(
-                    deployment_iterator.log, user
+                deployment = parse_deployment_log(
+                    deployment_iterator.log, DeploymentLog, user
                 )
             background_tasks.add_task(
                 self._background_iterate_operations,

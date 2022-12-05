@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from tdp.core.models import StateEnum
 
 
@@ -21,3 +21,12 @@ class OperationLog(BaseModel):
     end_time: datetime
     state: StateEnum
     logs: bytes
+
+    class Config:
+        orm_mode = True
+
+    @validator("start_time", "end_time")
+    def validate_datetimes(cls, dt, values):
+        if dt is not None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt
