@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Optional, Sequence
+from typing import Any, List, Sequence
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
@@ -14,7 +14,12 @@ from tdp_server.schemas import (
     DeployStatus,
     OperationLog,
 )
-from tdp_server.services import DeploymentCrud, RunnerService, StillRunningException
+from tdp_server.services import (
+    DeploymentCrud,
+    DeploymentPlanService,
+    RunnerService,
+    StillRunningException,
+)
 
 logger = logging.getLogger("tdp_server")
 router = APIRouter()
@@ -61,7 +66,7 @@ async def deploy_node(
         check_valid_nodes(deploy_request.sources, dag)
 
     try:
-        deployment_plan = await runner_service.make_deployment_plan(dag, deploy_request)
+        deployment_plan = await DeploymentPlanService.from_request(dag, deploy_request)
     except ValueError as e:
         logger.exception(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

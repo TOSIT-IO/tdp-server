@@ -1,9 +1,11 @@
 from datetime import datetime, timezone
 from typing import Optional
 
+from pydantic import parse_obj_as
 from tdp.core.models import DeploymentLog
+from tdp.core.operation import Operation as tdp_Operation
 
-from tdp_server.schemas import DeploymentLog
+from tdp_server.schemas import DeploymentLog, Operation
 
 
 def to_utc_datetime(dt: datetime) -> datetime:
@@ -29,3 +31,7 @@ def deployment_from_deployment_log(deployment_log: DeploymentLog, user: str):
         operations=list(map(lambda op: op.operation, deployment_log.operations)),
         user=user,
     )
+
+
+def operation_schema_from_operation(operation: tdp_Operation) -> Operation:
+    return parse_obj_as(Operation, operation.__dict__)
