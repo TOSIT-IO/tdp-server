@@ -15,7 +15,7 @@ from tdp.core.runner import (
 )
 
 from tdp_server.models import UserDeploymentLog
-from tdp_server.schemas import Deployment, DeployRequest
+from tdp_server.schemas import DeploymentLog, DeployRequest
 
 from .utils import deployment_from_deployment_log
 
@@ -54,7 +54,7 @@ class RunnerService:
         session_local: sessionmaker,
         user: str,
         deployment_plan: DeploymentPlan,
-    ) -> Deployment:
+    ) -> DeploymentLog:
         lock = self._file_lock()
         try:
             lock.acquire()

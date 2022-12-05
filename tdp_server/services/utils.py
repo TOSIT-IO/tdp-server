@@ -3,7 +3,7 @@ from typing import Optional
 
 from tdp.core.models import DeploymentLog
 
-from tdp_server.schemas import Deployment
+from tdp_server.schemas import DeploymentLog
 
 
 def to_utc_datetime(dt: datetime) -> datetime:
@@ -17,7 +17,7 @@ def to_optional_utc_datetime(dt: Optional[datetime]) -> Optional[datetime]:
 
 
 def deployment_from_deployment_log(deployment_log: DeploymentLog, user: str):
-    return Deployment(
+    return DeploymentLog(
         id=deployment_log.id,  # type: ignore
         sources=deployment_log.sources,  # type: ignore
         targets=deployment_log.targets,  # type: ignore

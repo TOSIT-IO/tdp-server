@@ -48,7 +48,7 @@ class DeployStatus(BaseModel):
     message: str
 
 
-class Deployment(BaseModel):
+class DeploymentLog(BaseModel):
     id: int
     sources: Optional[List[str]] = None
     targets: Optional[List[str]] = None
@@ -61,5 +61,5 @@ class Deployment(BaseModel):
     user: str
 
 
-class DeploymentWithOperations(Deployment):
+class DeploymentLogWithOperations(DeploymentLog):
     operations: List[OperationLog]
