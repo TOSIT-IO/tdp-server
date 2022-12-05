@@ -8,8 +8,8 @@ from tdp.core.dag import Dag
 from tdp_server.api import dependencies
 from tdp_server.db.session import SessionLocal
 from tdp_server.schemas import (
-    Deployment,
-    DeploymentWithOperations,
+    DeploymentLog,
+    DeploymentLogWithOperations,
     DeployRequest,
     DeployStatus,
     OperationLog,
@@ -51,7 +51,7 @@ async def deploy_node(
     user: str = Depends(dependencies.execute_protected),
     runner_service: RunnerService = Depends(dependencies.get_runner_service),
     background_tasks: BackgroundTasks,
-) -> Deployment:
+) -> DeploymentLog:
     """
     Launches a deployment from the dag
     """
@@ -104,7 +104,7 @@ def deployment_status(
 @router.get(
     "/",
     dependencies=[Depends(dependencies.read_protected)],
-    response_model=List[Deployment],
+    response_model=List[DeploymentLog],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployments(
@@ -119,7 +119,7 @@ def get_deployments(
 @router.get(
     "/{deployment_id}",
     dependencies=[Depends(dependencies.read_protected)],
-    response_model=DeploymentWithOperations,
+    response_model=DeploymentLogWithOperations,
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployment(

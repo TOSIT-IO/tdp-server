@@ -4,9 +4,10 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
-from tdp_server.db.base import DeploymentLog, OperationLog
+from tdp_server.db.base import DeploymentLog as tdp_DeploymentLog
+from tdp_server.db.base import OperationLog as tdp_OperationLog
 from tdp_server.models import UserDeploymentLog
-from tdp_server.schemas import Deployment, DeploymentWithOperations, OperationLog
+from tdp_server.schemas import DeploymentLog, DeploymentLogWithOperations, OperationLog
 
 from .utils import to_optional_utc_datetime, to_utc_datetime
 
@@ -21,17 +22,17 @@ def user_or_not(deployment_log) -> str:
 
 class DeploymentCrud:
     @staticmethod
-    def get_deployments(db: Session, limit: int, offset: int) -> List[Deployment]:
+    def get_deployments(db: Session, limit: int, offset: int) -> List[DeploymentLog]:
         query = (
-            select(DeploymentLog)
+            select(tdp_DeploymentLog)
             .outerjoin(UserDeploymentLog)
-            .order_by(DeploymentLog.id)
+            .order_by(tdp_DeploymentLog.id)
             .limit(limit)
             .offset(offset)
         )
         query_result = db.execute(query).unique().scalars().fetchall()
         return [
-            Deployment(
+            DeploymentLog(
                 id=deployment_log.id,
                 sources=deployment_log.sources,
                 targets=deployment_log.targets,
@@ -49,18 +50,18 @@ class DeploymentCrud:
         ]
 
     @staticmethod
-    def get_deployment(db: Session, deployment_id: int) -> DeploymentWithOperations:
+    def get_deployment(db: Session, deployment_id: int) -> DeploymentLogWithOperations:
         query = (
-            select(DeploymentLog)
+            select(tdp_DeploymentLog)
             .outerjoin(UserDeploymentLog)
-            .where(DeploymentLog.id == deployment_id)
+            .where(tdp_DeploymentLog.id == deployment_id)
         )
         try:
             deployment_log = db.execute(query).scalar_one()
         except NoResultFound:
             raise ValueError("Invalid deployment id")
 
-        return DeploymentWithOperations(
+        return DeploymentLogWithOperations(
             id=deployment_log.id,
             sources=deployment_log.sources,
             targets=deployment_log.targets,
@@ -87,9 +88,9 @@ class DeploymentCrud:
         db: Session, deployment_id: int, operation: str
     ) -> OperationLog:
         query = (
-            select(OperationLog)
-            .where(OperationLog.deployment_id == deployment_id)
-            .where(OperationLog.operation == operation)
+            select(tdp_OperationLog)
+            .where(tdp_OperationLog.deployment_id == deployment_id)
+            .where(tdp_OperationLog.operation == operation)
         )
         try:
             operation_log = db.execute(query).scalar_one()

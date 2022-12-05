@@ -1,7 +1,7 @@
 from .component import Component, ComponentUpdate, ComponentUpdateResponse
 from .deployment import (
-    Deployment,
-    DeploymentWithOperations,
+    DeploymentLog,
+    DeploymentLogWithOperations,
     DeployRequest,
     DeployStatus,
 )
