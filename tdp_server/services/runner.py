@@ -36,18 +36,6 @@ class RunnerService:
         # Timeout 0 makes it non blocking on every `acquire` call
         self._file_lock = partial(FileLock, lock_dir / ".deploy.lock", timeout=0)
 
-    async def make_deployment_plan(
-        self, dag: Dag, deploy_request: DeployRequest
-    ) -> DeploymentPlan:
-        deployment_arguments = {} if deploy_request is None else deploy_request.dict()
-        try:
-            deployment_plan = await run_in_threadpool(
-                DeploymentPlan.from_dag, dag, **deployment_arguments
-            )
-        except EmptyDeploymentPlanError as e:
-            raise ValueError(e) from e
-        return deployment_plan
-
     async def run(
         self,
         background_tasks: BackgroundTasks,
