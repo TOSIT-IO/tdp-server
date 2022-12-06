@@ -1,9 +1,11 @@
 import logging
-from typing import Any, List, Sequence
+from typing import Any, List
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
+from tdp.core.collections import Collections
 from tdp.core.dag import Dag
+from tdp.core.runner import DeploymentPlan
 
 from tdp_server.api import dependencies
 from tdp_server.db.session import SessionLocal
@@ -13,6 +15,7 @@ from tdp_server.schemas import (
     DeployRequest,
     DeployStatus,
     OperationLog,
+    RunRequest,
 )
 from tdp_server.services import (
     DeploymentCrud,
@@ -25,52 +28,12 @@ logger = logging.getLogger("tdp_server")
 router = APIRouter()
 
 
-def check_valid_nodes(nodes: Sequence, dag: Dag):
-    difference = set(nodes).difference(dag.operations)
-    if difference:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"the following nodes do not exist: {','.join(difference)}",
-        )
-
-
-@router.post(
-    "/",
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        409: {
-            "description": "Another deployment is still running, only one deployment at a time is allowed",
-            "content": {
-                "application/json": {
-                    "example": {"detail": "another deployment is still running"}
-                }
-            },
-        },
-    },
-    status_code=status.HTTP_202_ACCEPTED,
-)
-async def deploy_node(
-    *,
-    deploy_request: DeployRequest = DeployRequest(),
-    dag: Dag = Depends(dependencies.get_dag),
-    user: str = Depends(dependencies.execute_protected),
-    runner_service: RunnerService = Depends(dependencies.get_runner_service),
+async def launch_deployment(
+    runner_service: RunnerService,
     background_tasks: BackgroundTasks,
+    user: str,
+    deployment_plan: DeploymentPlan,
 ) -> DeploymentLog:
-    """
-    Launches a deployment from the dag
-    """
-    if deploy_request.targets:
-        check_valid_nodes(deploy_request.targets, dag)
-    if deploy_request.sources:
-        check_valid_nodes(deploy_request.sources, dag)
-
-    try:
-        deployment_plan = await DeploymentPlanService.from_request(dag, deploy_request)
-    except ValueError as e:
-        logger.exception(e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
     try:
         return await runner_service.run(
             background_tasks=background_tasks,
@@ -78,7 +41,6 @@ async def deploy_node(
             user=user,
             deployment_plan=deployment_plan,
         )
-
     except StillRunningException as e:
         logger.exception(e)
         raise HTTPException(
@@ -91,6 +53,71 @@ async def deploy_node(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="check server logs to investigate error",
         )
+
+
+COMMON_DEPLOYMENT_ARGS = {
+    "responses": {
+        **dependencies.COMMON_RESPONSES,
+        409: {
+            "description": "Another deployment is still running, only one deployment at a time is allowed",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "another deployment is still running"}
+                }
+            },
+        },
+    },
+    "status_code": status.HTTP_202_ACCEPTED,
+}
+
+
+@router.post("/", **COMMON_DEPLOYMENT_ARGS)
+async def deploy_node(
+    *,
+    deploy_request: DeployRequest = DeployRequest(),
+    dag: Dag = Depends(dependencies.get_dag),
+    user: str = Depends(dependencies.execute_protected),
+    runner_service: RunnerService = Depends(dependencies.get_runner_service),
+    background_tasks: BackgroundTasks,
+) -> DeploymentLog:
+    """
+    Launches a deployment from the dag
+    """
+
+    try:
+        deployment_plan = await DeploymentPlanService.from_request(dag, deploy_request)
+    except ValueError as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return await launch_deployment(
+        runner_service, background_tasks, user, deployment_plan
+    )
+
+
+@router.post("/run", **COMMON_DEPLOYMENT_ARGS)
+async def run_nodes(
+    *,
+    run_request: RunRequest,
+    collections: Collections = Depends(dependencies.get_collections),
+    user: str = Depends(dependencies.execute_protected),
+    runner_service: RunnerService = Depends(dependencies.get_runner_service),
+    background_tasks: BackgroundTasks,
+):
+    try:
+        deployment_plan = await DeploymentPlanService.from_run_request(
+            collections, run_request
+        )
+    except ValueError as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return await launch_deployment(
+        runner_service,
+        background_tasks,
+        user,
+        deployment_plan,
+    )
 
 
 @router.get(

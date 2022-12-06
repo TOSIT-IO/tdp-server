@@ -44,6 +44,13 @@ class DeployRequest(BaseModel):
         return value
 
 
+class RunRequest(BaseModel):
+    targets: List[str] = Field(
+        title="Run Targets",
+        description="List of operations to be run on the cluster.",
+    )
+
+
 class DeployStatus(BaseModel):
     message: str
 
