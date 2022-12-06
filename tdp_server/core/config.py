@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     OPENID_CLIENT_ID: str
     OPENID_CLIENT_SECRET: Optional[str] = None
 
+    # Secret key example: openssl rand -hex 32
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     SCOPE_NAMESPACE: str = "tdp_server"
 
     PROJECT_NAME: str

@@ -6,7 +6,7 @@ from tdp.core.dag import Dag
 from tdp.core.deployment import DeploymentRunner
 from tdp.core.variables import ClusterVariables
 
-from tdp_server.api.openid_dependencies import validate_token
+from tdp_server.api.security import validate_token
 from tdp_server.core.config import settings
 from tdp_server.db.session import SessionLocal
 from tdp_server.services import RunnerService
