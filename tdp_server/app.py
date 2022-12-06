@@ -3,10 +3,12 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from tdp.core.dag import Dag
 from tdp.core.deployment import AnsibleExecutor, DeploymentRunner, Executor
 from tdp.core.variables import ClusterVariables
 
+from tdp_server.api.security import router as security_router
 from tdp_server.api.v1.api import api_router
 from tdp_server.core.config import settings
 from tdp_server.services.runner import RunnerService
@@ -32,9 +34,10 @@ def create_app(
         allow_headers=["*"],
     )
     app.add_middleware(GZipMiddleware)
+    app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY, max_age=3600)
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
-
+    app.include_router(security_router)
     if dag is None:
         dag = Dag(settings.TDP_COLLECTIONS)
 
