@@ -6,6 +6,7 @@ from sqlalchemy.orm.session import Session
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag
 from tdp.core.runner import DeploymentPlan
+from tdp.core.variables import ClusterVariables
 
 from tdp_server.api import dependencies
 from tdp_server.db.session import SessionLocal
@@ -107,6 +108,32 @@ async def run_nodes(
     try:
         deployment_plan = await DeploymentPlanService.from_run_request(
             collections, run_request
+        )
+    except ValueError as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return await launch_deployment(
+        runner_service,
+        background_tasks,
+        user,
+        deployment_plan,
+    )
+
+
+@router.post("/reconfigure", **COMMON_DEPLOYMENT_ARGS)
+async def reconfigure(
+    *,
+    db: Session = Depends(dependencies.get_db),
+    dag: Dag = Depends(dependencies.get_dag),
+    cluster_variables: ClusterVariables = Depends(dependencies.get_cluster_variables),
+    user: str = Depends(dependencies.execute_protected),
+    runner_service: RunnerService = Depends(dependencies.get_runner_service),
+    background_tasks: BackgroundTasks,
+):
+    try:
+        deployment_plan = await DeploymentPlanService.from_reconfigure_request(
+            db, dag, cluster_variables
         )
     except ValueError as e:
         logger.exception(e)
