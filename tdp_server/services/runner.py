@@ -6,11 +6,7 @@ from fastapi import BackgroundTasks
 from filelock import FileLock, Timeout
 from sqlalchemy.orm.session import Session, sessionmaker
 from starlette.concurrency import run_in_threadpool
-from tdp.core.runner import (
-    DeploymentIterator,
-    DeploymentPlan,
-    DeploymentRunner,
-)
+from tdp.core.runner import DeploymentIterator, DeploymentPlan, DeploymentRunner
 
 from tdp_server.models import UserDeploymentLog
 from tdp_server.schemas import DeploymentLog
@@ -91,7 +87,8 @@ class RunnerService:
         try:
             with session_local() as session:
                 for operation_log, service_component_log in deployment_iterator:
-                    session.add(operation_log)
+                    if operation_log is not None:
+                        session.add(operation_log)
                     if service_component_log is not None:
                         session.add(service_component_log)
                     session.commit()
