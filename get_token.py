@@ -2,19 +2,19 @@
 
 import httpx
 
-# curl "http://localhost:8080/auth/realms/tdp_server_dev/protocol/openid-connect/token" -d "client_id=tdp_auth" -d "grant_type=password" -d "username=test_user1" -d "password=toto" -d "scope=openid tdp_server:read tdp_server:write tdp_server:execute"
+# curl "http://localhost:8080/auth/realms/tdp_server/protocol/openid-connect/token" -d "client_id=tdp_server&grant_type=password&username=user&password=secret&scope=openid tdp_server:read tdp_server:write tdp_server:execute"
 
 scopes = ["openid", "tdp_server:read", "tdp_server:write", "tdp_server:execute"]
 
 data = {
-    "client_id": "tdp_auth",
+    "client_id": "tdp_server",
     "grant_type": "password",
-    "username": "test_user1",
-    "password": "toto",
+    "username": "user",
+    "password": "secret",
     "scope": " ".join(scopes),
 }
 response = httpx.post(
-    "http://localhost:8080/auth/realms/tdp_server_dev/protocol/openid-connect/token",
+    "http://localhost:8080/auth/realms/tdp_server/protocol/openid-connect/token",
     data=data,
 )
 

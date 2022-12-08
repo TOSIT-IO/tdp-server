@@ -1,61 +1,53 @@
-version: '3.8'
+version: "3.8"
 services:
   db:
     container_name: postgres_container
-    image: postgres
-    restart: always
     environment:
-      POSTGRES_DB: tdp_dev_db
-      POSTGRES_USER: tdp_user
-      POSTGRES_PASSWORD: tdp_password
       PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    image: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
+    restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init_script.sql:/docker-entrypoint-initdb.d/init_script.sql:Z
+      - ./config/init_script.sql:/docker-entrypoint-initdb.d/init_script.sql:Z
+
+  keycloak:
+    command: start-dev --import-realm --http-relative-path=/auth
+    depends_on:
+      - db
+    environment:
+      KC_DB: postgres
+      KC_DB_PASSWORD: keycloak
+      KC_DB_SCHEMA: keycloak
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: Pa55w0rd
+    image: quay.io/keycloak/keycloak:20.0
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./config/realm.json:/opt/keycloak/data/import/realm.json:Z
 
   pgadmin:
     container_name: pgadmin4_container
-    image: dpage/pgadmin4:5.5
-    restart: always
+    depends_on:
+      - db
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: secret
       PGADMIN_LISTEN_PORT: 80
+    image: dpage/pgadmin4:6.17
     ports:
-      - "8081:80"
+      - '8081:80'
+    restart: always
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - ./config/pg_servers.json:/pgadmin4/servers.json:Z
 
-  keycloak:
-      image: quay.io/keycloak/keycloak:legacy
-      environment:
-        DB_VENDOR: POSTGRES
-        DB_ADDR: db
-        DB_DATABASE: keycloak
-        DB_USER: tdp_user
-        DB_SCHEMA: public
-        DB_PASSWORD: tdp_password
-        KEYCLOAK_USER: admin
-        KEYCLOAK_PASSWORD: Pa55w0rd
-      ports:
-        - 8080:8080
-      depends_on:
-        - db
-
-  keycloak_config:
-    image: quay.io/keycloak/keycloak:legacy
-    entrypoint: bash /entrypoint.sh
-    environment:
-      KC_ADDRESS: keycloak
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: Pa55w0rd
-    volumes:
-      - ./configure-keycloak.sh:/entrypoint.sh:Z
-    depends_on:
-      - keycloak
 
 volumes:
   db-data:
-  pgadmin-data:
