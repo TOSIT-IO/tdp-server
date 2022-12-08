@@ -1,22 +1,28 @@
+import logging
 from functools import wraps
-from typing import Any, Callable, Coroutine, List, TypeVar
+from typing import Any, Callable, Coroutine, List, Optional, TypeVar
 
 from sqlalchemy import and_, desc, func, or_, select, tuple_
-from sqlalchemy.orm import Query, Session
+from sqlalchemy.orm import Query, Session, joinedload
 from starlette.concurrency import run_in_threadpool
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag, IllegalNodeError
-from tdp.core.models import ServiceComponentLog
+from tdp.core.models import DeploymentLog, ServiceComponentLog
 from tdp.core.runner import (
     DeploymentPlan,
     EmptyDeploymentPlanError,
+    GeneratedDeploymentPlanMissesOperationError,
     NothingToRestartError,
+    NothingToResumeError,
+    UnsupportedDeploymentTypeError,
 )
 from tdp.core.variables import ClusterVariables
 
-from tdp_server.schemas import DeployRequest, Operation, RunRequest
+from tdp_server.schemas import DeployRequest, Operation, ResumeRequest, RunRequest
 
 from .utils import operation_schema_from_operation
+
+logger = logging.getLogger("tdp_server")
 
 T = TypeVar("T")
 
@@ -84,6 +90,30 @@ class DeploymentPlanService:
             raise ValueError("Nothing to restart") from e
 
     @staticmethod
+    async def from_resume_request(
+        db: Session, dag: Dag, resume_request: ResumeRequest
+    ) -> DeploymentPlan:
+        deployment_log = (
+            db.execute(get_deployment_log_query(resume_request.id))
+            .unique()
+            .scalar_one_or_none()
+        )
+        if deployment_log is None:
+            if resume_request.id is None:
+                raise ValueError("No deployments yet")
+            else:
+                raise ValueError(f"Deployment {resume_request.id} does not exist")
+        try:
+            return await AsyncDeploymentPlan.from_failed_deployment(dag, deployment_log)
+        except (
+            GeneratedDeploymentPlanMissesOperationError,
+            NothingToResumeError,
+            UnsupportedDeploymentTypeError,
+        ) as e:
+            logger.exception(e)
+            raise ValueError(str(e)) from e
+
+    @staticmethod
     async def get_plan_as_list(deployment_plan: DeploymentPlan) -> List[Operation]:
         return await run_in_threadpool(
             list, map(operation_schema_from_operation, deployment_plan.operations)
@@ -131,3 +161,18 @@ def get_latest_success_service_component_version_query() -> Query:
             ServiceComponentLog.component,
         )
     )
+
+
+def get_deployment_log_query(deployment_id: Optional[int] = None) -> Query:
+    query = (
+        select(DeploymentLog)
+        .options(
+            joinedload(DeploymentLog.service_components),
+            joinedload(DeploymentLog.operations),
+        )
+        .order_by(desc(DeploymentLog.id))
+        .limit(1)
+    )
+    if deployment_id is not None:
+        query = query.where(DeploymentLog.id == deployment_id)
+    return query
