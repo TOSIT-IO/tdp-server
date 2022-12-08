@@ -16,6 +16,7 @@ from tdp_server.schemas import (
     DeployRequest,
     DeployStatus,
     OperationLog,
+    ResumeRequest,
     RunRequest,
 )
 from tdp_server.services import (
@@ -108,6 +109,32 @@ async def run_nodes(
     try:
         deployment_plan = await DeploymentPlanService.from_run_request(
             collections, run_request
+        )
+    except ValueError as e:
+        logger.exception(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return await launch_deployment(
+        runner_service,
+        background_tasks,
+        user,
+        deployment_plan,
+    )
+
+
+@router.post("/resume", **COMMON_DEPLOYMENT_ARGS)
+async def resume(
+    *,
+    resume_request: ResumeRequest = ResumeRequest(),
+    db: Session = Depends(dependencies.get_db),
+    dag: Dag = Depends(dependencies.get_dag),
+    user: str = Depends(dependencies.execute_protected),
+    runner_service: RunnerService = Depends(dependencies.get_runner_service),
+    background_tasks: BackgroundTasks,
+):
+    try:
+        deployment_plan = await DeploymentPlanService.from_resume_request(
+            db, dag, resume_request
         )
     except ValueError as e:
         logger.exception(e)
