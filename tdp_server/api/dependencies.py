@@ -3,7 +3,7 @@ from typing import Generator
 from fastapi import Request, Security
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag
-from tdp.core.runner import DeploymentRunner
+from tdp.core.deployment import DeploymentRunner
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.openid_dependencies import validate_token

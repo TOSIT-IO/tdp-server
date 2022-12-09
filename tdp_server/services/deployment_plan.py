@@ -7,8 +7,7 @@ from sqlalchemy.orm import Query, Session, joinedload
 from starlette.concurrency import run_in_threadpool
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag, IllegalNodeError
-from tdp.core.models import DeploymentLog, ServiceComponentLog
-from tdp.core.runner import (
+from tdp.core.deployment import (
     DeploymentPlan,
     EmptyDeploymentPlanError,
     GeneratedDeploymentPlanMissesOperationError,
@@ -16,9 +15,15 @@ from tdp.core.runner import (
     NothingToResumeError,
     UnsupportedDeploymentTypeError,
 )
+from tdp.core.models import DeploymentLog, ServiceComponentLog
 from tdp.core.variables import ClusterVariables
 
-from tdp_server.schemas import DeployRequest, Operation, OperationsRequest, ResumeRequest
+from tdp_server.schemas import (
+    DeployRequest,
+    Operation,
+    OperationsRequest,
+    ResumeRequest,
+)
 
 from .utils import operation_schema_from_operation
 
