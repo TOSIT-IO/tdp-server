@@ -37,7 +37,7 @@ docker-compose -f dev/docker-compose.yml up -d
    - `DATABASE_DSN`: the data source name of the RDBMS.
    - `TDP_COLLECTION_PATH`: the path to one or more TDP collection, separated by `:` (as [`tdp-collection`](https://github.com/TOSIT-IO/tdp-collection) and [`tdp-collection-extras`](https://github.com/TOSIT-IO/tdp-collection-extras)).
    - `TDP_VARS`: the path to an empty directory where the `tdp_vars` will be stored and versioned.
-   - `TDP_RUN_DIRECTORY`: the path to the directory where the Ansible command will be launched (as [`tdp-getting-started`](https://github.com/tOSIT-IO/tdp-getting-started) for example).   
+   - `TDP_RUN_DIRECTORY`: the path to the directory where the Ansible command will be launched (as [`tdp-getting-started`](https://github.com/tOSIT-IO/tdp-getting-started) for example).
    _Note: the `ansible.cfg` file of the working directory must contain the path of the `tdp_vars` directory defined previously._
 1. Initialize the database and the `tdp_vars` directory:
    ```bash
@@ -52,6 +52,33 @@ Start the server using:
 ```bash
 uvicorn tdp_server.main:app --reload
 ```
+
+## Build Docker Container
+
+```bash
+docker build -t tdp_server -f docker/Dockerfile .
+```
+
+## Run Docker Container
+
+Executing the container with the minimal configuration variables:
+
+```bash
+docker run \
+  -e TDP_COLLECTION_PATH="/tdp/ops/tdp/ansible/ansible_collections/tosit/tdp" \
+  -e TDP_RUN_DIRECTORY="/tdp/ops" \
+  -e TDP_VARS="/tdp/ops/inventory/tdp_vars" \
+  -e DATABASE_DSN=sqlite:////tdp/sqlite.db \
+  -e OPENID_CONNECT_DISCOVERY_URL="http://host.docker.internal:8080/auth/realms/tdp_server/.well-known/openid-configuration" \
+  -e OPENID_CLIENT_ID=tdp_server \
+  -e OPENID_CLIENT_SECRET=secret \
+  -v "..../sqlite.db:/tdp/sqlite.db" \
+  -v"..../tdp-ops:/tdp/ops" \
+  -p 8000:8000 \
+  tdp_server
+```
+
+N.B.: Mounting a sqlite database is not the recommended way to persist the server's data.
 
 ### Accessing the REST API
 

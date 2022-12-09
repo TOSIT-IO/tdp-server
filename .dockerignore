@@ -1,0 +1,6 @@
+*
+!docker
+!alembic.ini
+!tdp_server
+!poetry.lock
+!pyproject.toml
