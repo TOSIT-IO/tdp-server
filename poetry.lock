@@ -898,7 +898,7 @@ visualization = ["matplotlib (==3.3.4)", "pydot (==1.4.2)"]
 type = "git"
 url = "https://github.com/TOSIT-IO/tdp-lib"
 reference = "HEAD"
-resolved_reference = "c8ff6d322fc7e6bd6dd2cafaf4dc211189732e3c"
+resolved_reference = "276f7dee70eb3517689ab3382c51d87df87d9e64"
 
 [[package]]
 name = "tenacity"

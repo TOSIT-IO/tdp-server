@@ -5,7 +5,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm.session import Session
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag
-from tdp.core.runner import DeploymentPlan
+from tdp.core.deployment import DeploymentPlan
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api import dependencies

@@ -1,9 +1,8 @@
 from typing import Type, TypeVar
 
 from pydantic import parse_obj_as
-from tdp.core.models import DeploymentLog
-from tdp.core.operation import Operation as tdp_Operation
 from tdp.core.models import DeploymentLog as tdp_DeploymentLog
+from tdp.core.operation import Operation as tdp_Operation
 
 from tdp_server.schemas import DeploymentLog, Operation
 

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from tdp.core.dag import Dag
-from tdp.core.runner import AnsibleExecutor, DeploymentRunner, Executor
+from tdp.core.deployment import AnsibleExecutor, DeploymentRunner, Executor
 from tdp.core.variables import ClusterVariables
 
 from tdp_server.api.v1.api import api_router
