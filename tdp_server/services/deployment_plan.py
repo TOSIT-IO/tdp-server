@@ -18,7 +18,7 @@ from tdp.core.runner import (
 )
 from tdp.core.variables import ClusterVariables
 
-from tdp_server.schemas import DeployRequest, Operation, ResumeRequest, RunRequest
+from tdp_server.schemas import DeployRequest, Operation, OperationsRequest, ResumeRequest
 
 from .utils import operation_schema_from_operation
 
@@ -56,11 +56,11 @@ class DeploymentPlanService:
         return deployment_plan
 
     @staticmethod
-    async def from_run_request(
-        collections: Collections, request: RunRequest
+    async def from_operations_request(
+        collections: Collections, request: OperationsRequest
     ) -> DeploymentPlan:
         operations = []
-        for target in request.targets:
+        for target in request.operations:
             try:
                 operation = collections.operations[target]
             except KeyError as e:
@@ -70,7 +70,7 @@ class DeploymentPlanService:
             if operation.noop:
                 raise ValueError(
                     f"'{target}' is tagged as noop and thus"
-                    " cannot be executed in a run request"
+                    " cannot be executed in an operations request"
                 )
             operations.append(operation)
         return await AsyncDeploymentPlan.from_operations(operations)

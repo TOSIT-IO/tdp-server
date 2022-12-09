@@ -16,8 +16,8 @@ from tdp_server.schemas import (
     DeployRequest,
     DeployStatus,
     OperationLog,
+    OperationsRequest,
     ResumeRequest,
-    RunRequest,
 )
 from tdp_server.services import (
     DeploymentCrud,
@@ -82,9 +82,7 @@ async def deploy_node(
     runner_service: RunnerService = Depends(dependencies.get_runner_service),
     background_tasks: BackgroundTasks,
 ) -> DeploymentLog:
-    """
-    Launches a deployment from the dag
-    """
+    """Launches a deployment from the dag"""
 
     try:
         deployment_plan = await DeploymentPlanService.from_request(dag, deploy_request)
@@ -97,18 +95,20 @@ async def deploy_node(
     )
 
 
-@router.post("/run", **COMMON_DEPLOYMENT_ARGS)
-async def run_nodes(
+@router.post("/operations", **COMMON_DEPLOYMENT_ARGS)
+async def operations(
     *,
-    run_request: RunRequest,
+    operations_request: OperationsRequest,
     collections: Collections = Depends(dependencies.get_collections),
     user: str = Depends(dependencies.execute_protected),
     runner_service: RunnerService = Depends(dependencies.get_runner_service),
     background_tasks: BackgroundTasks,
 ):
+    """Run a list of operations on the cluster, can use operations outside
+    of the dag"""
     try:
-        deployment_plan = await DeploymentPlanService.from_run_request(
-            collections, run_request
+        deployment_plan = await DeploymentPlanService.from_operations_request(
+            collections, operations_request
         )
     except ValueError as e:
         logger.exception(e)
