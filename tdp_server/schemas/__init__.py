@@ -4,8 +4,8 @@ from .deployment import (
     DeploymentLogWithOperations,
     DeployRequest,
     DeployStatus,
+    OperationsRequest,
     ResumeRequest,
-    RunRequest,
 )
 from .operation import Operation, OperationLog
 from .service import Service, ServiceUpdate, ServiceUpdateResponse

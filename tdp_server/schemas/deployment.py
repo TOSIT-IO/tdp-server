@@ -46,10 +46,13 @@ class DeployRequest(BaseModel):
         return value
 
 
-class RunRequest(BaseModel):
-    targets: List[str] = Field(
-        title="Run Targets",
-        description="List of operations to be run on the cluster.",
+class OperationsRequest(BaseModel):
+    operations: List[str] = Field(
+        title="Operations",
+        description=(
+            "List of operations to be run on the cluster."
+            " Can be operations outside of the dag."
+        ),
     )
 
 
