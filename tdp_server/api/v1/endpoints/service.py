@@ -38,15 +38,17 @@ def get_services(
     """
     services = []
     for service, service_operations in dag.services_operations.items():
+        version = cluster_variables[service].version
         services.append(
             Service(
                 id=service,
                 components=[
-                    Component(id=operation.component)
+                    Component(id=operation.component, version=version)
                     for operation in service_operations
                     if operation.component
                 ],
                 variables=VariablesCrud.get_variables(cluster_variables[service]),
+                version=version,
             )
         )
     return services
@@ -76,10 +78,12 @@ def get_service(
         components = {
             operation.component for operation in operations if operation.component
         }
+        version = cluster_variables[service_id].version
         return Service(
             id=service_id,
-            components=[Component(id=component) for component in components],
+            components=[Component(id=component, version=version) for component in components],
             variables=VariablesCrud.get_variables(cluster_variables[service_id]),
+            version=version,
         )
     except KeyError:
         raise HTTPException(

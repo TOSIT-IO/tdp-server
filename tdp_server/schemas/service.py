@@ -14,6 +14,7 @@ class Service(BaseModel):
     id: str
     components: List[Component]
     variables: Optional[Variables] = None
+    version: str
 
     class Config:
         schema_extra = {
@@ -23,6 +24,7 @@ class Service(BaseModel):
                 "variables": {
                     "hdfs_site": {"dfs.nameservices": "bigdata_cluster"},
                 },
+                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
             }
         }
 
