@@ -12,11 +12,13 @@ from tdp_server.schemas.variables import Variables
 class Component(BaseModel):
     id: str
     variables: Optional[Variables] = None
+    version: str
 
     class Config:
         schema_extra = {
             "example": {
                 "id": "journalnode",
+                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "variables": {
                     "hdfs_site": {
                         "dfs.journalnode.kerberos.principal": "jn/master-01.lan@TDP.REALM"

@@ -46,12 +46,14 @@ def get_component(
     service_id = service_id.lower()
     component_id = component_id.lower()
     try:
+        version = cluster_variables[service_id].version
         component = cluster_variables[service_id].get_component_name(dag, component_id)
         return Component(
             id=component_id,
             variables=VariablesCrud.get_variables(
                 cluster_variables[service_id], component
             ),
+            version=version,
         )
     except (KeyError, ValueError):
         raise HTTPException(
