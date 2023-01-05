@@ -1,6 +1,5 @@
 from typing import List
 
-from pydantic import parse_obj_as
 from starlette.concurrency import run_in_threadpool
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag

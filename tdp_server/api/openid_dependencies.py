@@ -3,7 +3,13 @@ from typing import Mapping, Optional
 
 from authlib.integrations.starlette_client import OAuth, StarletteOAuth2App
 from fastapi import Depends, HTTPException, status
-from fastapi.security import SecurityScopes
+from fastapi.openapi.models import (
+    OAuthFlowAuthorizationCode,
+    OAuthFlowImplicit,
+    OAuthFlowPassword,
+    OAuthFlows,
+)
+from fastapi.security import OAuth2, SecurityScopes
 from fastapi.security.open_id_connect_url import OpenIdConnect
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
@@ -59,9 +65,34 @@ async def mock_validate_token(
     return {"sub": "fake_user_from_mock_validate_token"}
 
 
+SCOPES = {
+    "tdp_server:read": "Allow get operations",
+    "tdp_server:write": "Allow post/put/patch operations",
+    "tdp_server:execute": "Allow deployment operations",
+}
+
+OAUTH2_SCHEME = OAuth2(
+    flows=OAuthFlows(
+        authorizationCode=OAuthFlowAuthorizationCode(
+            authorizationUrl="/api/v1/security/authorize",
+            tokenUrl="/api/v1/security/token",
+            scopes=SCOPES,
+        ),
+        # implicit=OAuthFlowImplicit(
+        #     authorizationUrl="/auth",
+        #     scopes=SCOPES,
+        # ),
+        # password=OAuthFlowPassword(
+        #     tokenUrl="/token",
+        #     scopes=SCOPES,
+        # ),
+    )
+)
+
+
 async def validate_token(
     security_scopes: SecurityScopes,
-    authorization: Optional[str] = Depends(openid_connect),
+    authorization: Optional[str] = Depends(OAUTH2_SCHEME),
     metadata: dict = Depends(issuer_metadata),
     public_key: str = Depends(issuer_public_key),
 ) -> Mapping:

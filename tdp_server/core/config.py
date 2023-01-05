@@ -32,6 +32,14 @@ class Settings(BaseSettings):
     OPENID_CONNECT_DISCOVERY_URL: AnyHttpUrl
     OPENID_CLIENT_ID: str
     OPENID_CLIENT_SECRET: Optional[str] = None
+    
+   # Secret key example: openssl rand -hex 32
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_SECONDS: int = 1800
+    ACCESS_TOKEN_LENGTH: int = 42
+    REFRESH_TOKEN_LENGTH: int = 48
+
 
     SCOPE_NAMESPACE: str = "tdp_server"
 
