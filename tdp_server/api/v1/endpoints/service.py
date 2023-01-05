@@ -37,17 +37,28 @@ def get_services(
     Returns the list of services
     """
     services = []
-    for service, service_operations in dag.services_operations.items():
-        version = cluster_variables[service].version
+    for service_name, service_operations in dag.services_operations.items():
+        service = cluster_variables[service_name]
+        version = service.version
+        components = {
+            operation.component
+            for operation in service_operations
+            if operation.component
+        }
         services.append(
             Service(
-                id=service,
+                id=service_name,
                 components=[
-                    Component(id=operation.component, version=version)
-                    for operation in service_operations
-                    if operation.component
+                    Component(
+                        id=component,
+                        variables=VariablesCrud.get_variables(
+                            service, service.name + "_" + component
+                        ),
+                        version=version,
+                    )
+                    for component in components
                 ],
-                variables=VariablesCrud.get_variables(cluster_variables[service]),
+                variables=VariablesCrud.get_variables(service),
                 version=version,
             )
         )
@@ -78,11 +89,21 @@ def get_service(
         components = {
             operation.component for operation in operations if operation.component
         }
-        version = cluster_variables[service_id].version
+        service = cluster_variables[service_id]
+        version = service.version
         return Service(
             id=service_id,
-            components=[Component(id=component, version=version) for component in components],
-            variables=VariablesCrud.get_variables(cluster_variables[service_id]),
+            components=[
+                Component(
+                    id=component,
+                    variables=VariablesCrud.get_variables(
+                        service, service.name + "_" + component
+                    ),
+                    version=version,
+                )
+                for component in components
+            ],
+            variables=VariablesCrud.get_variables(service),
             version=version,
         )
     except KeyError:
