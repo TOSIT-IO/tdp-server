@@ -39,7 +39,9 @@ def create_app(
         dag = Dag(settings.TDP_COLLECTIONS)
 
     if cluster_variables is None:
-        cluster_variables = ClusterVariables.get_cluster_variables(settings.TDP_VARS)
+        cluster_variables = ClusterVariables.get_cluster_variables(
+            settings.TDP_COLLECTIONS, settings.TDP_VARS
+        )
 
     if executor is None:
         executor = AnsibleExecutor(settings.TDP_RUN_DIRECTORY, settings.MOCK_DEPLOY)
@@ -51,6 +53,7 @@ def create_app(
 
     if runner_service is None:
         runner_service = RunnerService(deployment_runner, settings.TDP_RUN_DIRECTORY)
+
     app.state.settings = settings
     app.state.dag = dag
     app.state.cluster_variables = cluster_variables
