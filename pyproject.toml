@@ -6,7 +6,7 @@ authors = ["Guillaume Boutry <diode-boutry.consultant@dgfip.finances.gouv.fr>"]
 
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
-fastapi = { version = "0.75.0" }
+fastapi = { version = "0.83.0" }
 tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib" }
 alembic = "1.7.7"
 tenacity = "8.0.1"
@@ -19,7 +19,7 @@ filelock = "3.4.1"
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
 requests = "2.27.1"
-black = "21.12b0"
+black = "22.8.0"
 isort = "5.10.1"
 uvicorn = { version = "0.16.0", extras = ["standard"] }
 pre-commit = "2.17.0"
