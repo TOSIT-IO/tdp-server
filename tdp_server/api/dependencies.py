@@ -1,10 +1,10 @@
 from typing import Generator
 
-from fastapi import Request, Security
+from fastapi import Depends, HTTPException, Path, Request, Security, status
 from tdp.core.collections import Collections
 from tdp.core.dag import Dag
 from tdp.core.deployment import DeploymentRunner
-from tdp.core.variables import ClusterVariables
+from tdp.core.variables import ClusterVariables, ServiceVariables
 
 from tdp_server.api.openid_dependencies import validate_token
 from tdp_server.core.config import settings
@@ -34,6 +34,26 @@ COMMON_RESPONSES = {
     },
 }
 
+SERVICE_ID_DOES_NOT_EXIST_ERROR = {
+    400: {
+        "description": "Service id does not exists",
+        "content": {
+            "application/json": {"example": {"detail": "{service_id} does not exists"}}
+        },
+    }
+}
+
+COMPONENT_ID_DOES_NOT_EXIST_ERROR = {
+    400: {
+        "description": "Component id does not exists",
+        "content": {
+            "application/json": {
+                "example": {"detail": "{component_id} does not exists"}
+            }
+        },
+    }
+}
+
 
 def get_db() -> Generator:
     with SessionLocal() as db:
@@ -58,6 +78,20 @@ def get_collections(request: Request) -> Collections:
 
 def get_runner_service(request: Request) -> RunnerService:
     return request.app.state.runner_service
+
+
+def service(
+    service_id: str = Path(),
+    cluster_variables: ClusterVariables = Depends(get_cluster_variables),
+) -> ServiceVariables:
+    service_id = service_id.lower()
+    service_variables = cluster_variables.get(service_id)
+    if service_variables is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{service_id} does not exist.",
+        )
+    return service_variables
 
 
 async def read_protected(
