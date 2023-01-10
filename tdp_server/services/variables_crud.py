@@ -1,7 +1,10 @@
 from typing import Any, Mapping, Optional, Tuple
 
+import jsonschema
+from jsonschema.exceptions import ValidationError
 from tdp.core.repository.repository import EmptyCommit
-from tdp.core.variables import ServiceVariables
+from tdp.core.variables import ServiceVariables, VariablesDict
+from tdp.core.variables.service_variables import YML_EXTENSION, CustomValidator
 
 from tdp_server.schemas import Variables
 
@@ -9,26 +12,27 @@ from tdp_server.schemas import Variables
 class VariablesCrud:
     @staticmethod
     def get_variables(
-        service_variables: ServiceVariables, name: Optional[str] = None
+        service: ServiceVariables, name: Optional[str] = None
     ) -> Variables:
-        filename: str = name or service_variables.name
-        variables = service_variables.get_variables(filename)
+        filename: str = name or service.name
+        variables = service.get_variables(filename)
         return Variables(__root__=variables or {})
 
     @staticmethod
     def update_variables(
-        service_variables: ServiceVariables,
+        service: ServiceVariables,
         content: Mapping[str, Any],
         message: str,
         name: Optional[str] = None,
         merge: bool = True,
     ) -> Tuple[str, str]:
-        filename: str = name or service_variables.name
+        service_or_component: str = name or service.name
+        is_service = name == service.name
+        validate_schema(service, content, merge, service_or_component, is_service)
         try:
-            with service_variables.open_var_files(
-                message, [f"{filename}.yml"]
-            ) as configurations:
-                service_configuration = configurations[f"{filename}.yml"]
+            filename = service_or_component + YML_EXTENSION
+            with service.open_var_files(message, [filename]) as configurations:
+                service_configuration = configurations[filename]
                 if merge:
                     service_configuration.merge(content)
                 else:
@@ -36,4 +40,29 @@ class VariablesCrud:
                     service_configuration.update(content)
         except EmptyCommit as e:
             raise ValueError(e)
-        return service_variables.version, message
+        return service.version, message
+
+
+def validate_schema(
+    service: ServiceVariables,
+    content: Mapping[str, Any],
+    merge: bool,
+    service_or_component,
+    is_service: bool,
+):
+    to_check = VariablesDict(service.get_variables(service.name))
+
+    if is_service:
+        if merge:
+            to_check.merge(content)
+        else:
+            to_check = VariablesDict(content)
+    else:
+        if merge:
+            component_vars = VariablesDict(service.get_variables(service_or_component))
+            to_check.merge(component_vars)
+        to_check.merge(content)
+    try:
+        jsonschema.validate(to_check, service.schema, CustomValidator)
+    except ValidationError as e:
+        raise ValueError(str(e))
