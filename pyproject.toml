@@ -15,6 +15,7 @@ Authlib = "1.0.0"
 httpx = "0.22.0"
 python-jose = { version = "3.3.0", extras = ["cryptography"] }
 filelock = "3.4.1"
+jsonschema = "3.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
