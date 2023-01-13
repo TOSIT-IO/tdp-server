@@ -73,8 +73,8 @@ COMMON_DEPLOYMENT_ARGS = {
 }
 
 
-@router.post("/", **COMMON_DEPLOYMENT_ARGS)
-async def deploy_node(
+@router.post("/dag", **COMMON_DEPLOYMENT_ARGS)
+async def dag(
     *,
     deploy_request: DeployRequest = DeployRequest(),
     dag: Dag = Depends(dependencies.get_dag),
