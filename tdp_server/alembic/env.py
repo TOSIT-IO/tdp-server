@@ -1,10 +1,8 @@
 from __future__ import with_statement
 
-import os
 from logging.config import fileConfig
 
 from alembic import context
-
 from tdp_server.core.config import settings
 from tdp_server.db.base import Base  # noqa
 from tdp_server.db.session import engine
