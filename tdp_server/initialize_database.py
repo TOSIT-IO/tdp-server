@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from tdp.core import models as tdp_models
 
 from alembic import command
@@ -9,5 +11,5 @@ from tdp_server.db.session import engine
 
 Base.metadata.create_all(engine)
 
-alembic_cfg = Config("alembic.ini")
+alembic_cfg = Config(str(Path(__file__).parent / ".." / "alembic.ini"))
 command.stamp(alembic_cfg, "head")
