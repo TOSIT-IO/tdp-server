@@ -42,6 +42,7 @@ def get_services(
                 components=[
                     Component(
                         id=component,
+                        service_id=service.name,
                         variables=VariablesCrud.get_variables(
                             service, service.name + "_" + component
                         ),
@@ -83,6 +84,7 @@ def get_service(
         components=[
             Component(
                 id=component,
+                service_id=service.name,
                 variables=VariablesCrud.get_variables(
                     service, service.name + "_" + component
                 ),

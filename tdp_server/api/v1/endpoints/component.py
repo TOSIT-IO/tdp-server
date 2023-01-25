@@ -37,6 +37,7 @@ def get_component(
         component = service.get_component_name(dag, component_id)
         return Component(
             id=component_id,
+            service_id=service.name,
             variables=VariablesCrud.get_variables(service, component),
             version=version,
         )

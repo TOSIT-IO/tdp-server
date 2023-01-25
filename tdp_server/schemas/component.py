@@ -11,6 +11,7 @@ from tdp_server.schemas.variables import Variables
 
 class Component(BaseModel):
     id: str
+    service_id: str
     variables: Optional[Variables] = None
     version: str
 
