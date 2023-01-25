@@ -9,7 +9,7 @@ A full beginers guide to launch a testing server is provided at [`docs/quick-sta
 The server is made with Python. The following is required:
 
 - [Python](https://www.python.org/) `^3.6`
-- [Poetry](https://python-poetry.org/)
+- [Poetry](https://python-poetry.org/) `1.1.15`
 - A RDBMS, to store deployment history (e.g. [PostgresQL](https://www.postgresql.org/))
 - An identity management system, for authentication purposes (e.g. [Keycloak](https://www.keycloak.org/))
 
