@@ -73,7 +73,7 @@ COMMON_DEPLOYMENT_ARGS = {
 }
 
 
-@router.post("/dag", **COMMON_DEPLOYMENT_ARGS)
+@router.post("/dag", **COMMON_DEPLOYMENT_ARGS, response_model=DeploymentLog)
 async def dag(
     *,
     deploy_request: DeployRequest = DeployRequest(),
@@ -95,7 +95,7 @@ async def dag(
     )
 
 
-@router.post("/operations", **COMMON_DEPLOYMENT_ARGS)
+@router.post("/operations", **COMMON_DEPLOYMENT_ARGS, response_model=DeploymentLog)
 async def operations(
     *,
     operations_request: OperationsRequest,
@@ -122,7 +122,7 @@ async def operations(
     )
 
 
-@router.post("/resume", **COMMON_DEPLOYMENT_ARGS)
+@router.post("/resume", **COMMON_DEPLOYMENT_ARGS, response_model=DeploymentLog)
 async def resume(
     *,
     resume_request: ResumeRequest = ResumeRequest(),
@@ -148,7 +148,7 @@ async def resume(
     )
 
 
-@router.post("/reconfigure", **COMMON_DEPLOYMENT_ARGS)
+@router.post("/reconfigure", **COMMON_DEPLOYMENT_ARGS, response_model=DeploymentLog)
 async def reconfigure(
     *,
     db: Session = Depends(dependencies.get_db),
