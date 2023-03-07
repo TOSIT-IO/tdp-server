@@ -29,6 +29,8 @@ def init() -> None:
     except Exception as e:
         logger.error(e)
         raise e
+    finally:
+        db.close()
 
 
 def main() -> None:

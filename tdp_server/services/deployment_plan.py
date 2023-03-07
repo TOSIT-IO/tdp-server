@@ -87,6 +87,7 @@ class DeploymentPlanService:
         latest_successes = db.execute(
             get_latest_success_service_component_version_query()
         ).all()
+        db.close()
         try:
             return await AsyncDeploymentPlan.from_reconfigure(
                 dag, cluster_variables, latest_successes
@@ -103,6 +104,7 @@ class DeploymentPlanService:
             .unique()
             .scalar_one_or_none()
         )
+        db.close()
         if deployment_log is None:
             if resume_request.id is None:
                 raise ValueError("No deployments yet")

@@ -23,6 +23,7 @@ class DeploymentCrud:
             .offset(offset)
         )
         query_result = db.execute(query).unique().scalars().fetchall()
+        db.close()
 
         return [
             parse_deployment_log(deployment_log, DeploymentLog)
@@ -40,6 +41,8 @@ class DeploymentCrud:
             deployment_log = db.execute(query).scalar_one()
         except NoResultFound:
             raise ValueError("Invalid deployment id")
+        finally:
+            db.close()
         deployment_schema = parse_deployment_log(
             deployment_log, DeploymentLogWithOperations
         )
@@ -58,5 +61,7 @@ class DeploymentCrud:
             operation_log = db.execute(query).scalar_one()
         except NoResultFound:
             raise ValueError("Invalid deployment id or operation name")
+        finally:
+            db.close()
 
         return OperationLog.from_orm(operation_log)
