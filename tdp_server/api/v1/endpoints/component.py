@@ -124,7 +124,7 @@ def put_component(
             component_update.variables.__root__,
             update_message,
             name=component,
-            merge=True,
+            merge=False,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
