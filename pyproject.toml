@@ -5,7 +5,7 @@ description = ""
 authors = ["Guillaume Boutry <diode-boutry.consultant@dgfip.finances.gouv.fr>"]
 
 [tool.poetry.dependencies]
-python = ">=3.6.2,<4.0"
+python = ">=3.9.0,<4.0"
 fastapi = { version = "0.83.0" }
 tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib" }
 alembic = "1.7.7"
@@ -15,7 +15,7 @@ Authlib = "1.0.0"
 httpx = "0.22.0"
 python-jose = { version = "3.3.0", extras = ["cryptography"] }
 filelock = "3.4.1"
-jsonschema = "3.2.0"
+jsonschema = "4.10.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
