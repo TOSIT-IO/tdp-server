@@ -7,7 +7,7 @@ authors = ["Guillaume Boutry <diode-boutry.consultant@dgfip.finances.gouv.fr>"]
 [tool.poetry.dependencies]
 python = ">=3.6.2,<4.0"
 fastapi = { version = "0.83.0" }
-tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib" }
+tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib", tag = "0.1" }
 alembic = "1.7.7"
 tenacity = "8.0.1"
 psycopg2-binary = { version ="2.9.5", optional = true}
