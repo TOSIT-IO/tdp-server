@@ -1,6 +1,6 @@
-# Quick-start
+# Quick start
 
-This guide walks you through the deployment of a TDP server, based on [`tdp-collection`](https://github.com/TOSIT-IO/tdp-collection/). For testing purpose, we'll use [SQLite](https://www.sqlite.org/index.html), a single-file database, and no authentication.
+This guide walks you through the deployment of TDP Server, based on [`tdp-collection`](https://github.com/TOSIT-IO/tdp-collection/). For testing purpose, we'll use [SQLite](https://www.sqlite.org/index.html), a single-file database, and no authentication.
 
 For a more feature-rich testing environment, please use the provided [`docker-compose.yml`](../dev/).
 

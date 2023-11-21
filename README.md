@@ -1,4 +1,4 @@
-# TDP SERVER
+# TDP Server
 
 `tdp-server` provides a server to interact with [`tdp-lib`](https://github.com/tOSIT-IO/tdp-lib).
 
