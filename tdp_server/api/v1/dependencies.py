@@ -22,7 +22,7 @@ COMMON_RESPONSES = {
 }
 
 SERVICE_ID_DOES_NOT_EXIST_ERROR = {
-    400: {
+    404: {
         "description": "Service id does not exist",
         "content": {
             "application/json": {"example": {"detail": "{service_id} does not exist"}}
@@ -31,7 +31,7 @@ SERVICE_ID_DOES_NOT_EXIST_ERROR = {
 }
 
 COMPONENT_ID_DOES_NOT_EXIST_ERROR = {
-    400: {
+    404: {
         "description": "Component id does not exist",
         "content": {
             "application/json": {"example": {"detail": "{component_id} does not exist"}}
