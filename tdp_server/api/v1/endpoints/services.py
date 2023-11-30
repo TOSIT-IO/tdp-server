@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi_pagination import Page
 
 from typing import List
 
@@ -10,7 +11,7 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_model=List[ServiceId],
+    response_model=Page[List[ServiceId]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_services():

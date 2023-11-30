@@ -10,6 +10,7 @@ python = "^3.9"
 tdp-lib = { git = "https://github.com/TOSIT-IO/tdp-lib" }
 fastapi = "^0.104.1"
 uvicorn = "^0.24.0.post1"
+fastapi-pagination = "^0.12.13"
 
 [build-system]
 requires = ["poetry-core"]

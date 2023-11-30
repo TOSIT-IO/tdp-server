@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from fastapi_pagination import Page
+
 from typing import List
 
 from tdp_server.api.v1 import dependencies
@@ -9,7 +11,7 @@ router = APIRouter()
 
 @router.post(
     "/dag",
-    response_model=List[Operation],
+    response_model=Page[List[Operation]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def post_plan_dag():
@@ -18,7 +20,7 @@ def post_plan_dag():
 
 @router.post(
     "/operations",
-    response_model=List[Operation],
+    response_model=Page[List[Operation]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def post_plan_operations():
@@ -27,7 +29,7 @@ def post_plan_operations():
 
 @router.post(
     "/resume",
-    response_model=List[Operation],
+    response_model=Page[List[Operation]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def post_plan_resume():
@@ -36,7 +38,7 @@ def post_plan_resume():
 
 @router.post(
     "/reconfigure",
-    response_model=List[Operation],
+    response_model=Page[List[Operation]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def post_plan_reconfigure():
@@ -45,7 +47,7 @@ def post_plan_reconfigure():
 
 @router.post(
     "/import",
-    response_model=List[Operation],
+    response_model=Page[List[Operation]],
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
