@@ -17,8 +17,8 @@ def get_variables():
     pass
 
 
-@router.post(
-    "/validation",
+@router.get(
+    "/validate",
     response_model=VariableValidation,
     responses={**dependencies.COMMON_RESPONSES},
 )
