@@ -22,14 +22,5 @@ def get_variables():
     response_model=VariableValidation,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_validation():
-    pass
-
-
-@router.post(
-    "/{import_file}",
-    response_model=List[Variables],
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def post_import():
+def post_validate():
     pass
