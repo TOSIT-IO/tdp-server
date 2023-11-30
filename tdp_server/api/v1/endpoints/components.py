@@ -48,6 +48,18 @@ def patch_component():
     pass
 
 
+@router.post(
+    "/{component_id}/variables",
+    response_model=Component,
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def post_component_variables():
+    pass
+
+
 @router.get(
     "/status",
     response_model=List[CurrentStatus],

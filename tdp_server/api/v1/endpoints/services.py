@@ -51,3 +51,15 @@ def put_service():
 )
 def patch_service():
     pass
+
+
+@router.post(
+    "{service_id}/variables",
+    response_model=Service,
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def post_service_variables():
+    pass
