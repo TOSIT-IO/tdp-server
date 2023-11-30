@@ -34,7 +34,7 @@ def get_deployment():
 
 
 @router.get(
-    "/{deployement_id}/operation/{operation}",
+    "/{deployement_id}/operations/{operation_order}/logs",
     response_model=OperationLog,
     responses={**dependencies.COMMON_RESPONSES},
 )
@@ -52,48 +52,12 @@ def get_deployment_status():
 
 
 @router.post(
-    "/dag",
+    "/deploy",
     response_model=DeploymentLog,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.COMMON_DEPLOYMENT_ARGS,
     },
 )
-def post_dag():
-    pass
-
-
-@router.post(
-    "/operations",
-    response_model=DeploymentLog,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMMON_DEPLOYMENT_ARGS,
-    },
-)
-def post_operations():
-    pass
-
-
-@router.post(
-    "/resume",
-    response_model=DeploymentLog,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMMON_DEPLOYMENT_ARGS,
-    },
-)
-def post_resume():
-    pass
-
-
-@router.post(
-    "/reconfigure",
-    response_model=DeploymentLog,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMMON_DEPLOYMENT_ARGS,
-    },
-)
-def post_reconfigure():
+def post_deploy():
     pass
