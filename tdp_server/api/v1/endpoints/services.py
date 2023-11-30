@@ -4,14 +4,14 @@ from fastapi_pagination import Page
 from typing import List
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.services import Service, ServiceId, ServiceUpdateResponse
+from tdp_server.schemas.services import Service, ServiceUpdateResponse
 
 router = APIRouter()
 
 
 @router.get(
     "/",
-    response_model=Page[List[ServiceId]],
+    response_model=Page[List[str]],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_services():

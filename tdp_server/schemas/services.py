@@ -26,9 +26,5 @@ class Service(BaseModel):
         }
 
 
-class ServiceId(BaseModel):
-    id: str
-
-
 class ServiceUpdateResponse(ServiceOrComponentUpdateResponse):
     pass
