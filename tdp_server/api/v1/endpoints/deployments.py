@@ -74,24 +74,24 @@ def post_operations():
 
 
 @router.post(
-    "/resumption",
+    "/resume",
     response_model=DeploymentLog,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.COMMON_DEPLOYMENT_ARGS,
     },
 )
-def post_resumumption():
+def post_resume():
     pass
 
 
 @router.post(
-    "/reconfiguration",
+    "/reconfigure",
     response_model=DeploymentLog,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.COMMON_DEPLOYMENT_ARGS,
     },
 )
-def post_reconfiguration():
+def post_reconfigure():
     pass

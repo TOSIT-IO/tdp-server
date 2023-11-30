@@ -26,30 +26,30 @@ def post_plan_operations():
 
 
 @router.post(
-    "/resumption",
+    "/resume",
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_resumption():
+def post_plan_resume():
     pass
 
 
 @router.post(
-    "/reconfiguration",
+    "/reconfigure",
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_reconfiguration():
+def post_plan_reconfigure():
     pass
 
 
 @router.post(
-    "/importation",
+    "/import",
     response_model=List[Operation],
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def post_importation():
+def post_import():
     pass

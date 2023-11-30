@@ -4,7 +4,7 @@ from tdp_server.api.v1.endpoints import (
     services,
     deployments,
     operations,
-    planification,
+    plan,
     variables,
 )
 
@@ -20,6 +20,4 @@ api_router.include_router(
 )
 api_router.include_router(variables.router, prefix="/variables", tags=["variables"])
 api_router.include_router(operations.router, prefix="/operations", tags=["operations"])
-api_router.include_router(
-    planification.router, prefix="/planification", tags=["planification"]
-)
+api_router.include_router(plan.router, prefix="/plan", tags=["plan"])
