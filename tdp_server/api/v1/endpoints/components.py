@@ -71,6 +71,15 @@ def get_services():
     pass
 
 
+@router.get(
+    "/status/{component_id}",
+    response_model=CurrentStatus,
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def get_services():
+    pass
+
+
 @router.post(
     "/stales",
     response_model=Page[List[StaleComponent]],
