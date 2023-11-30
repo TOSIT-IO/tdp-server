@@ -23,5 +23,5 @@ def get_variables():
     response_model=VariableValidation,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_validate():
+def get_validate():
     pass
