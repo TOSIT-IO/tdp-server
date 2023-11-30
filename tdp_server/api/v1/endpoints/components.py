@@ -1,7 +1,13 @@
 from fastapi import APIRouter
 
+from typing import List
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.components import Component, ComponentUpdateResponse
+from tdp_server.schemas.components import (
+    Component,
+    ComponentUpdateResponse,
+    CurrentStatus,
+    StaleComponent,
+)
 
 router = APIRouter()
 
@@ -39,4 +45,22 @@ def put_component():
     },
 )
 def patch_component():
+    pass
+
+
+@router.get(
+    "/status",
+    response_model=List[CurrentStatus],
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def get_services():
+    pass
+
+
+@router.post(
+    "/stales",
+    response_model=List[StaleComponent],
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def post_stales():
     pass
