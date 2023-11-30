@@ -25,3 +25,12 @@ def get_variables():
 )
 def get_validate():
     pass
+
+
+@router.get(
+    "/schemas",
+    response_model=dict,
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def get_validate():
+    pass
