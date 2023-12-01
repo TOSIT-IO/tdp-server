@@ -65,7 +65,7 @@ def post_component_variables(service_id: str, component_id: str):
     response_model=Page[CurrentStatus],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_services(service_id: str):
+def get_status(service_id: str):
     pass
 
 
@@ -74,7 +74,7 @@ def get_services(service_id: str):
     response_model=CurrentStatus,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_services(service_id: str, component_id: str):
+def get_component_status(service_id: str, component_id: str):
     pass
 
 

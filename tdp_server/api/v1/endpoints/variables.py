@@ -30,5 +30,5 @@ def get_validate():
     response_model=dict,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_validate():
+def get_schemas():
     pass
