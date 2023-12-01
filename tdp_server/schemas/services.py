@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from tdp.core.utils import BaseEnum
 from tdp_server.schemas.common import ServiceOrComponentUpdateResponse
 from tdp_server.schemas.components import Component
 from tdp_server.schemas.variables import Variables
@@ -28,3 +29,15 @@ class Service(BaseModel):
 
 class ServiceUpdateResponse(ServiceOrComponentUpdateResponse):
     pass
+
+
+class ServiceStateEnum(BaseEnum):
+    RUNNING = "Running"
+    STOPPED = "Stopped"
+    FAILING = "Failing"
+
+
+class ServiceStatus(BaseModel):
+    service: str
+    version: str
+    status: ServiceStateEnum
