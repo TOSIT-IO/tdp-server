@@ -27,7 +27,7 @@ def get_deployments():
     response_model=DeploymentLogWithOperations,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_deployment():
+def get_deployment(deployement_id: int):
     pass
 
 
@@ -36,7 +36,7 @@ def get_deployment():
     response_model=OperationLog,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_deployment_operation():
+def get_deployment_operation(deployement_id: int, operation_order: str):
     pass
 
 

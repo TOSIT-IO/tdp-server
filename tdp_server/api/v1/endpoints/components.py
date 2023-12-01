@@ -20,7 +20,7 @@ router = APIRouter()
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def get_component():
+def get_component(service_id: str, component_id: str):
     pass
 
 
@@ -32,7 +32,7 @@ def get_component():
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def put_component():
+def put_component(service_id: str, component_id: str):
     pass
 
 
@@ -44,7 +44,7 @@ def put_component():
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def patch_component():
+def patch_component(service_id: str, component_id: str):
     pass
 
 
@@ -56,7 +56,7 @@ def patch_component():
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def post_component_variables():
+def post_component_variables(service_id: str, component_id: str):
     pass
 
 
@@ -65,7 +65,7 @@ def post_component_variables():
     response_model=Page[CurrentStatus],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_services():
+def get_services(service_id: str):
     pass
 
 
@@ -74,7 +74,7 @@ def get_services():
     response_model=CurrentStatus,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_services():
+def get_services(service_id: str, component_id: str):
     pass
 
 
@@ -83,5 +83,5 @@ def get_services():
     response_model=Page[StaleComponent],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_stales():
+def post_stales(service_id: str):
     pass

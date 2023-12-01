@@ -24,7 +24,7 @@ def get_services():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def get_service():
+def get_service(service_id: str):
     pass
 
 
@@ -36,7 +36,7 @@ def get_service():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def put_service():
+def put_service(service_id: str):
     pass
 
 
@@ -48,7 +48,7 @@ def put_service():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def patch_service():
+def patch_service(service_id: str):
     pass
 
 
@@ -60,5 +60,5 @@ def patch_service():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def post_service_variables():
+def post_service_variables(service_id: str):
     pass
