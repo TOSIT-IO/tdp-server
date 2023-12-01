@@ -1,8 +1,6 @@
 from fastapi import APIRouter
 from fastapi_pagination import Page
 
-from typing import List
-
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.deployments import (
     DeploymentLog,
@@ -17,7 +15,7 @@ router = APIRouter()
 
 @router.get(
     "/",
-    response_model=Page[List[DeploymentLog]],
+    response_model=Page[DeploymentLog],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployments():
