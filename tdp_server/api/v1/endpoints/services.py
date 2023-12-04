@@ -2,13 +2,13 @@ from fastapi import APIRouter
 from fastapi_pagination import Page
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.services import Service, ServiceUpdateResponse, ServiceStatus
+from tdp_server.schemas.services import Service, ServiceUpdateResponse
 
 router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=Page[str],
     responses={**dependencies.COMMON_RESPONSES},
 )
@@ -49,24 +49,6 @@ def put_service(service_id: str):
     },
 )
 def patch_service(service_id: str):
-    pass
-
-
-@router.get(
-    "/status",
-    response_model=Page[ServiceStatus],
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def get_services_status():
-    pass
-
-
-@router.get(
-    "/status/{service_id}",
-    response_model=ServiceStatus,
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def get_service_status(service_id: str):
     pass
 
 

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -8,36 +9,32 @@ from tdp_server.schemas.components import Component
 from tdp_server.schemas.variables import Variables
 
 
-class Service(BaseModel):
-    id: str
-    components: List[Component]
-    variables: Optional[Variables] = None
-    version: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "id": "hdfs",
-                "components": [Component.Config.json_schema_extra["example"]],
-                "variables": {
-                    "hdfs_site": {"dfs.nameservices": "bigdata_cluster"},
-                },
-                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
-            }
-        }
-
-
-class ServiceUpdateResponse(ServiceOrComponentUpdateResponse):
-    pass
-
-
 class ServiceStateEnum(BaseEnum):
     RUNNING = "Running"
     STOPPED = "Stopped"
     FAILING = "Failing"
 
 
-class ServiceStatus(BaseModel):
-    service: str
+class Service(BaseModel):
+    id: str
     version: str
     status: ServiceStateEnum
+    components: List[Component]
+    variables_url: Optional[Path] = None
+    schemas_url: Optional[Path] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "hdfs",
+                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "status": "Running",
+                "components": [Component.Config.json_schema_extra["example"]],
+                "variables_url": "https://...",
+                "schema_url": "https://...",
+            },
+        }
+
+
+class ServiceUpdateResponse(ServiceOrComponentUpdateResponse):
+    pass
