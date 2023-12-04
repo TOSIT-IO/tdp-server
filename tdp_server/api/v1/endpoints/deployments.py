@@ -47,15 +47,3 @@ def get_deployment_operation(deployement_id: int, operation_order: str):
 )
 def get_deployment_status():
     pass
-
-
-@router.post(
-    "/deploy",
-    response_model=DeploymentLog,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMMON_DEPLOYMENT_ARGS,
-    },
-)
-def post_deploy():
-    pass
