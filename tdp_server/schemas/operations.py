@@ -2,11 +2,18 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 from pydantic import BaseModel
+from tdp.core.utils import BaseEnum
 from tdp.core.models.state_enum import DeploymentStateEnum
+
+
+class Operationtype(BaseEnum):
+    DAG = "Dag"
+    OTHER = "Other"
 
 
 class Operation(BaseModel):
     name: str
+    type: Operationtype
     collection_name: Optional[str] = None
     depends_on: List[str] = []
     noop: bool = False
