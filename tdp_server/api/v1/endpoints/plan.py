@@ -53,3 +53,15 @@ def post_plan_reconfigure():
 )
 def post_import():
     pass
+
+
+@router.post(
+    "/custom",
+    response_model=Page[Operation],
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
+    },
+)
+def post_costum():
+    pass
