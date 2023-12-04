@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from fastapi_pagination import Page
+from fastapi_pagination.cursor import CursorPage
+from typing import List
 
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.components import (
@@ -62,7 +63,7 @@ def post_component_variables(service_id: str, component_id: str):
 
 @router.get(
     "/status",
-    response_model=Page[CurrentStatus],
+    response_model=CursorPage[CurrentStatus],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_status(service_id: str):
@@ -80,7 +81,7 @@ def get_component_status(service_id: str, component_id: str):
 
 @router.post(
     "/stales",
-    response_model=Page[StaleComponent],
+    response_model=List[StaleComponent],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def post_stales(service_id: str):

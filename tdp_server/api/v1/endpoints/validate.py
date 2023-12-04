@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi_pagination import Page
 
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.variables import Variables, VariableValidation

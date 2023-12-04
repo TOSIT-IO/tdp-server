@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi_pagination import Page
+from fastapi_pagination.cursor import CursorPage
 
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.services import Service, ServiceUpdateResponse
@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=Page[str],
+    response_model=CursorPage[str],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_services():
