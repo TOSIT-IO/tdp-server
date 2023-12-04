@@ -1,5 +1,6 @@
 .vscode
 __pycache__
 .env
+.venv/
 dist/
 .python-version
