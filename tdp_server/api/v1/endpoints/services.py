@@ -62,3 +62,15 @@ def patch_service(service_id: str):
 )
 def post_service_variables(service_id: str):
     pass
+
+
+@router.post(
+    "{service_id}/schema",
+    response_model={},
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def post_service_schema(service_id: str):
+    pass
