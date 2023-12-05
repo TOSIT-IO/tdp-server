@@ -22,8 +22,6 @@ poetry install
 To see the specification:
 
 ```sh
-# Install dependencies
-poetry install
 # Launch the server
 poetry run uvicorn tdp_server.main:app --reload
 ``` 
