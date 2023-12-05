@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from tdp_server.schemas.common import ServiceOrComponentUpdateResponse
+from tdp_server.schemas.status import CurrentStatus
 from tdp_server.schemas.variables import Variables
 
 
@@ -13,6 +14,9 @@ class Component(BaseModel):
     variables: Optional[Variables] = None
     running_version: str
     configured_version: str
+    host: str
+    to_config: str
+    to_restart: str
 
     class Config:
         json_schema_extra = {
@@ -20,6 +24,7 @@ class Component(BaseModel):
                 "id": "journalnode",
                 "running_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "configured_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "host": "master-01",
                 "variables": {
                     "hdfs_site": {
                         "dfs.journalnode.kerberos.principal": "jn/master-01.lan@TDP.REALM"
@@ -27,16 +32,6 @@ class Component(BaseModel):
                 },
             }
         }
-
-
-class CurrentStatus(BaseModel):
-    service: str
-    component: str
-    host: str
-    running_version: str
-    configured_version: str
-    to_config: str
-    to_restart: str
 
 
 class StatusHistory(CurrentStatus):

@@ -63,25 +63,7 @@ def post_component_variables(service_id: str, component_id: str):
 
 
 @router.get(
-    "/status",
-    response_model=CursorPage[CurrentStatus],
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def get_status(service_id: str):
-    pass
-
-
-@router.get(
-    "/status/{component_id}",
-    response_model=CurrentStatus,
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def get_component_status(service_id: str, component_id: str):
-    pass
-
-
-@router.get(
-    "/status-history/{component_id}",
+    "/{component_id}/status-history",
     response_model=StatusHistory,
     responses={**dependencies.COMMON_RESPONSES},
 )

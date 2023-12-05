@@ -6,6 +6,7 @@ from tdp_server.api.v1.endpoints import (
     deploy,
     operations,
     plan,
+    status,
     validate,
 )
 
@@ -16,6 +17,7 @@ api_router.include_router(services.router, prefix="/services", tags=["services"]
 api_router.include_router(
     components.router, prefix="/services/{service_id}/components", tags=["components"]
 )
+api_router.include_router(status.router, prefix="/status", tags=["status"])
 api_router.include_router(
     deployments.router, prefix="/deployments", tags=["deployments"]
 )
