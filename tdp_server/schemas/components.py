@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -34,6 +35,13 @@ class CurrentStatus(BaseModel):
     configured_version: str
     to_config: str
     to_restart: str
+
+
+class StatusHistory(CurrentStatus):
+    id: int
+    source: str
+    deployment_id: int
+    event_time: datetime
 
 
 class StaleComponent(BaseModel):

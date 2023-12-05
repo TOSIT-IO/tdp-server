@@ -8,6 +8,7 @@ from tdp_server.schemas.components import (
     ComponentUpdateResponse,
     CurrentStatus,
     StaleComponent,
+    StatusHistory,
 )
 
 router = APIRouter()
@@ -73,6 +74,15 @@ def get_status(service_id: str):
 @router.get(
     "/status/{component_id}",
     response_model=CurrentStatus,
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def get_component_status(service_id: str, component_id: str):
+    pass
+
+
+@router.get(
+    "/status-history/{component_id}",
+    response_model=StatusHistory,
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_component_status(service_id: str, component_id: str):
