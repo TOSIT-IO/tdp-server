@@ -4,6 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, validator
 
 from tdp.core.models.state_enum import DeploymentStateEnum
+from tdp.core.models.deployment_model import DeploymentTypeEnum
 from tdp_server.schemas.operations import OperationLog
 
 
@@ -21,13 +22,12 @@ class DeployStatus(BaseModel):
 
 class DeploymentLog(BaseModel):
     id: int
-    sources: Optional[List[str]] = None
-    targets: Optional[List[str]] = None
-    filter_expression: Optional[str] = None
+    options: Optional[dict]
     start_time: datetime
     end_time: Optional[datetime] = None
     restart: bool = False
     status: DeploymentStateEnum
+    deployment_type: DeploymentTypeEnum
     operations: List[str]
     user: Optional[str] = "NO_USER_RECORDED"
 
