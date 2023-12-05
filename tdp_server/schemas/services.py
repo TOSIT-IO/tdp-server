@@ -17,7 +17,8 @@ class ServiceStateEnum(BaseEnum):
 
 class Service(BaseModel):
     id: str
-    version: str
+    running_version: str
+    configured_version: str
     status: ServiceStateEnum
     components: List[Component]
     variables_url: Optional[Path] = None
@@ -27,7 +28,8 @@ class Service(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": "hdfs",
-                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "running_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "configured_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "status": "Running",
                 "components": [Component.Config.json_schema_extra["example"]],
                 "variables_url": "https://...",

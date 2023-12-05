@@ -21,4 +21,3 @@ class Variables(BaseModel):
 
 class VariableValidation(BaseModel):
     message: str
-    version: str

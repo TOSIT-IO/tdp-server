@@ -11,13 +11,15 @@ class Component(BaseModel):
     id: str
     service_id: str
     variables: Optional[Variables] = None
-    version: str
+    running_version: str
+    configured_version: str
 
     class Config:
         json_schema_extra = {
             "example": {
                 "id": "journalnode",
-                "version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "running_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
+                "configured_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "variables": {
                     "hdfs_site": {
                         "dfs.journalnode.kerberos.principal": "jn/master-01.lan@TDP.REALM"
