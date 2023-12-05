@@ -85,7 +85,7 @@ def get_component_status(service_id: str, component_id: str):
     response_model=StatusHistory,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_component_status(service_id: str, component_id: str):
+def get_component_history(service_id: str, component_id: str):
     pass
 
 
