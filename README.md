@@ -19,10 +19,13 @@ poetry install
 
 ## Usage
 
-Start the server as follows:
+To see the specification:
 
-```bash
-uvicorn tdp_server.main:app --reload
-```
+```sh
+# Install dependencies
+poetry install
+# Launch the server
+poetry run uvicorn tdp_server.main:app --reload
+``` 
 
-Swagger is on the following [url](http://localhost:8000/docs#/)
+Specification is available at <http://localhost:8000/docs>.
