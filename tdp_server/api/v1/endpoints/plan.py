@@ -1,7 +1,15 @@
 from fastapi import APIRouter
 from typing import List
+from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
+from tdp_server.schemas.plan import (
+    PlanOptionsCommon,
+    PlanOptionsDag,
+    PlanOptionsOperations,
+    PlanOptionsReconfigure,
+    PlanOptionsCostum,
+)
 from tdp_server.schemas.operations import Operation
 
 router = APIRouter()
@@ -12,7 +20,7 @@ router = APIRouter()
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_dag():
+def post_plan_dag(options: PlanOptionsDag):
     pass
 
 
@@ -21,7 +29,7 @@ def post_plan_dag():
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_operations():
+def post_plan_operations(option: PlanOptionsOperations):
     pass
 
 
@@ -30,7 +38,7 @@ def post_plan_operations():
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_resume():
+def post_plan_resume(options: PlanOptionsCommon):
     pass
 
 
@@ -39,7 +47,7 @@ def post_plan_resume():
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_reconfigure():
+def post_plan_reconfigure(Options: PlanOptionsReconfigure):
     pass
 
 
@@ -51,7 +59,7 @@ def post_plan_reconfigure():
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def post_import():
+def post_import(options: Path):
     pass
 
 
@@ -63,5 +71,5 @@ def post_import():
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def post_costum():
+def post_costum(options: PlanOptionsCostum):
     pass
