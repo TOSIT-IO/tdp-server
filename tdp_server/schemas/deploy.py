@@ -1,13 +1,10 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
+
+from tdp_server.schemas.common import CommonOptions
 
 
-class DeployOptions(BaseModel):
-    collections: List[str]
-    database_dsn: str
+class DeployOptions(CommonOptions):
     force_stale_update: Optional[bool] = False
     dry: Optional[bool] = False
     mock_deploy: Optional[bool] = False
-    validate: Optional[bool] = False
-    run_directory: str
-    variables: str
+    run_directory: Optional[str]
