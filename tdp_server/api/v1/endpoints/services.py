@@ -28,49 +28,13 @@ def get_service(service_id: str):
     pass
 
 
-@router.put(
-    "/{service_id}",
+@router.post(
+    "/{service_id}/variables",
     response_model=ServiceUpdateResponse,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def put_service(service_id: str):
-    pass
-
-
-@router.patch(
-    "/{service_id}",
-    response_model=ServiceUpdateResponse,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
-    },
-)
-def patch_service(service_id: str):
-    pass
-
-
-@router.post(
-    "{service_id}/variables",
-    response_model=Service,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
-    },
-)
-def provide_service_variables(service_id: str):
-    pass
-
-
-@router.post(
-    "{service_id}/schema",
-    response_model={},
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
-    },
-)
-def provide_service_schema(service_id: str):
+def provide_service_variables(service_id: str, service: Service):
     pass

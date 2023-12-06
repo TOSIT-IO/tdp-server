@@ -22,6 +22,7 @@ class Component(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": "journalnode",
+                "service_id": "hdfs",
                 "running_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "configured_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "host": "master-01",

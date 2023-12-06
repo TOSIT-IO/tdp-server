@@ -26,39 +26,17 @@ def get_component(service_id: str, component_id: str):
     pass
 
 
-@router.put(
-    "/{component_id}",
-    response_model=ComponentUpdateResponse,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
-    },
-)
-def put_component(service_id: str, component_id: str):
-    pass
-
-
-@router.patch(
-    "/{component_id}",
-    response_model=ComponentUpdateResponse,
-    responses={
-        **dependencies.COMMON_RESPONSES,
-        **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
-    },
-)
-def patch_component(service_id: str, component_id: str):
-    pass
-
-
 @router.post(
     "/{component_id}/variables",
-    response_model=Component,
+    response_model=ComponentUpdateResponse,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def provide_component_variables(service_id: str, component_id: str):
+def provide_component_variables(
+    service_id: str, component_id: str, component: Component
+):
     pass
 
 
