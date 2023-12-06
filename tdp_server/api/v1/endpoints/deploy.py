@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.deployments import DeploymentLog
 from tdp_server.schemas.operations import OperationLog
+from tdp_server.schemas.deploy import DeployOptions
 
 
 router = APIRouter()
@@ -16,5 +17,5 @@ router = APIRouter()
         **dependencies.COMMON_DEPLOYMENT_ARGS,
     },
 )
-def post_deploy():
+def post_deploy(options: DeployOptions):
     pass
