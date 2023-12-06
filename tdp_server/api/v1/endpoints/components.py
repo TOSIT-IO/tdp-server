@@ -6,7 +6,7 @@ from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.components import (
     Component,
     ComponentUpdateResponse,
-    CurrentStatus,
+    ComponentGenerateStalesOptions,
     StaleComponent,
     StatusHistory,
 )
@@ -72,9 +72,11 @@ def get_component_history(service_id: str, component_id: str):
 
 
 @router.post(
-    "/stales",
+    "/{component_id}/stales",
     response_model=List[StaleComponent],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def provide_stales(service_id: str):
+def provide_stales(
+    service_id: str, component_id: str, options: ComponentGenerateStalesOptions
+):
     pass

@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from tdp_server.schemas.common import ServiceOrComponentUpdateResponse
+from tdp_server.schemas.common import ServiceOrComponentUpdateResponse, CommonOptions
 from tdp_server.schemas.status import CurrentStatus
 from tdp_server.schemas.variables import Variables
 
@@ -48,4 +48,8 @@ class StaleComponent(BaseModel):
 
 
 class ComponentUpdateResponse(ServiceOrComponentUpdateResponse):
+    pass
+
+
+class ComponentGenerateStalesOptions(CommonOptions):
     pass
