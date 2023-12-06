@@ -58,7 +58,7 @@ def patch_component(service_id: str, component_id: str):
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def post_component_variables(service_id: str, component_id: str):
+def provide_component_variables(service_id: str, component_id: str):
     pass
 
 
@@ -76,5 +76,5 @@ def get_component_history(service_id: str, component_id: str):
     response_model=List[StaleComponent],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_stales(service_id: str):
+def provide_stales(service_id: str):
     pass

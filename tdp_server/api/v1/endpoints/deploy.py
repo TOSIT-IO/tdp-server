@@ -17,5 +17,5 @@ router = APIRouter()
         **dependencies.COMMON_DEPLOYMENT_ARGS,
     },
 )
-def post_deploy(options: DeployOptions):
+def deploy(options: DeployOptions):
     pass

@@ -20,7 +20,7 @@ router = APIRouter()
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_dag(options: PlanOptionsDag):
+def plan_dag(options: PlanOptionsDag):
     pass
 
 
@@ -29,7 +29,7 @@ def post_plan_dag(options: PlanOptionsDag):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_operations(option: PlanOptionsOperations):
+def plan_operations(option: PlanOptionsOperations):
     pass
 
 
@@ -38,7 +38,7 @@ def post_plan_operations(option: PlanOptionsOperations):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_resume(options: PlanOptionsCommon):
+def plan_resume(options: PlanOptionsCommon):
     pass
 
 
@@ -47,7 +47,7 @@ def post_plan_resume(options: PlanOptionsCommon):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def post_plan_reconfigure(Options: PlanOptionsReconfigure):
+def plan_reconfigure(Options: PlanOptionsReconfigure):
     pass
 
 
@@ -59,7 +59,7 @@ def post_plan_reconfigure(Options: PlanOptionsReconfigure):
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def post_import(options: Path):
+def plan_from_import(options: Path):
     pass
 
 
@@ -71,5 +71,5 @@ def post_import(options: Path):
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def post_costum(options: PlanOptionsCostum):
+def plan_costum(options: PlanOptionsCostum):
     pass

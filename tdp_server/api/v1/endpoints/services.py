@@ -60,7 +60,7 @@ def patch_service(service_id: str):
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def post_service_variables(service_id: str):
+def provide_service_variables(service_id: str):
     pass
 
 
@@ -72,5 +72,5 @@ def post_service_variables(service_id: str):
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def post_service_schema(service_id: str):
+def provide_service_schema(service_id: str):
     pass
