@@ -21,6 +21,9 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_dag(options: PlanOptionsDag):
+    """
+    Plans from the DAG.
+    """
     pass
 
 
@@ -30,6 +33,9 @@ def plan_dag(options: PlanOptionsDag):
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_operations(option: PlanOptionsOperations):
+    """
+    Runs a list of operations.
+    """
     pass
 
 
@@ -39,6 +45,9 @@ def plan_operations(option: PlanOptionsOperations):
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_resume(options: PlanOptionsCommon):
+    """
+    Resumes a failed or stopped deployment.
+    """
     pass
 
 
@@ -48,6 +57,9 @@ def plan_resume(options: PlanOptionsCommon):
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_reconfigure(Options: PlanOptionsReconfigure):
+    """
+    Renconfigures required TDP services.
+    """
     pass
 
 
@@ -60,6 +72,9 @@ def plan_reconfigure(Options: PlanOptionsReconfigure):
     },
 )
 def plan_from_import(options: Path):
+    """
+    Plans from an imported file.
+    """
     pass
 
 
@@ -72,4 +87,7 @@ def plan_from_import(options: Path):
     },
 )
 def plan_costum(options: PlanOptionsCostum):
+    """
+    Customizes an existing plan.
+    """
     pass

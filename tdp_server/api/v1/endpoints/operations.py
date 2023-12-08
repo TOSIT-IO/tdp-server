@@ -14,4 +14,13 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_operations(options: Optional[Operationtype] = None):
+    """
+    Returns a list of operations.
+
+    Options:
+
+    - Dag: shows operations from DAG.
+
+    - Other: shows other operations.
+    """
     pass

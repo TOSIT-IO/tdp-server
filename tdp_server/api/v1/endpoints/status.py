@@ -13,4 +13,7 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_status():
+    """
+    Shows service and component status.
+    """
     pass

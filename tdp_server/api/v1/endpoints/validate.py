@@ -12,4 +12,7 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_validate():
+    """
+    Validates service and component variables.
+    """
     pass

@@ -23,6 +23,9 @@ router = APIRouter()
     },
 )
 def get_component(service_id: str, component_id: str):
+    """
+    Returns the chosen component details.
+    """
     pass
 
 
@@ -37,6 +40,9 @@ def get_component(service_id: str, component_id: str):
 def provide_component_variables(
     service_id: str, component_id: str, component: Component
 ):
+    """
+    Modifies the component variables.
+    """
     pass
 
 
@@ -46,6 +52,9 @@ def provide_component_variables(
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_component_history(service_id: str, component_id: str):
+    """
+    Show history of all services and components running and configured versions.
+    """
     pass
 
 
@@ -57,4 +66,7 @@ def get_component_history(service_id: str, component_id: str):
 def provide_stales(
     service_id: str, component_id: str, options: ComponentGenerateStalesOptions
 ):
+    """
+    Pass the component to stale.
+    """
     pass

@@ -13,6 +13,9 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_services():
+    """
+    Returns a list of services.
+    """
     pass
 
 
@@ -25,6 +28,9 @@ def get_services():
     },
 )
 def get_service(service_id: str):
+    """
+    Returns the chosen service details.
+    """
     pass
 
 
@@ -37,4 +43,7 @@ def get_service(service_id: str):
     },
 )
 def provide_service_variables(service_id: str, service: Service):
+    """
+    Modifies the service variables.
+    """
     pass
