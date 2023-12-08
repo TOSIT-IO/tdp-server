@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi_pagination.cursor import CursorPage
 from typing import Optional
 
 from tdp_server.api.v1 import dependencies
@@ -10,7 +11,7 @@ router = APIRouter()
 
 @router.get(
     "",
-    response_model=Operation,
+    response_model=CursorPage[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_operations(options: Optional[Operationtype] = None):
