@@ -30,7 +30,3 @@ class DeploymentLog(BaseModel):
     deployment_type: DeploymentTypeEnum
     operations: List[str]
     user: Optional[str] = "NO_USER_RECORDED"
-
-
-class DeploymentLogWithOperations(DeploymentLog):
-    operations: List[OperationLog]

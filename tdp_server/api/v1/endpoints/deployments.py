@@ -4,7 +4,6 @@ from fastapi_pagination.cursor import CursorPage
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.deployments import (
     DeploymentLog,
-    DeploymentLogWithOperations,
     DeployStatus,
 )
 from tdp_server.schemas.operations import OperationLog
@@ -14,7 +13,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_model=CursorPage[DeploymentLog],
     responses={**dependencies.COMMON_RESPONSES},
 )
@@ -27,7 +26,7 @@ def get_deployments():
 
 @router.get(
     "/{deployement_id}",
-    response_model=DeploymentLogWithOperations,
+    response_model=CursorPage[DeploymentLog],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployment(deployement_id: int):
