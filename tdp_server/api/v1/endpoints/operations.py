@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/{Operationtype}",
     response_model=CursorPage[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
