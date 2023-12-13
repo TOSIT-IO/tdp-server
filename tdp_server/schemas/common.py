@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
-from tdp_server.schemas.variables import Variables
+from tdp.core.utils import BaseEnum
 
 
 class ServiceOrComponentUpdateResponse(BaseModel):
@@ -13,3 +13,8 @@ class CommonOptions(BaseModel):
     database_dsn: str
     validate_vars: Optional[bool] = False
     variables: str
+
+
+class StateEnum(BaseEnum):
+    start = "Start"
+    stop = "Stop"
