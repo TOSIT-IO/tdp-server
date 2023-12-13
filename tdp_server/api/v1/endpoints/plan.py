@@ -1,15 +1,9 @@
 from fastapi import APIRouter
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.plan import (
-    PlanOptionsCommon,
-    PlanOptionsDag,
-    PlanOptionsOperations,
-    PlanOptionsReconfigure,
-    PlanOptionsCostum,
-)
+from tdp_server.schemas.plan import PlanOptionsDag
 from tdp_server.schemas.operations import Operation
 
 router = APIRouter()
@@ -20,9 +14,21 @@ router = APIRouter()
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_dag(options: PlanOptionsDag):
+def plan_dag(
+    preview: bool = False,
+    options: Optional[PlanOptionsDag] = None,
+    filter: Optional[str] = None,
+):
     """
     Plans from the DAG.
+
+    options:
+
+    - restart: bool
+
+    - reverse: bool
+
+    - stop: bool
     """
     pass
 
@@ -32,7 +38,7 @@ def plan_dag(options: PlanOptionsDag):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_operations(option: PlanOptionsOperations):
+def plan_operations(operation_names: str, extra_vars: str, hosts: str):
     """
     Runs a list of operations.
     """
@@ -44,7 +50,7 @@ def plan_operations(option: PlanOptionsOperations):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_resume(options: PlanOptionsCommon):
+def plan_resume(preview: bool = False):
     """
     Resumes a failed or stopped deployment.
     """
@@ -56,7 +62,7 @@ def plan_resume(options: PlanOptionsCommon):
     response_model=List[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_reconfigure(Options: PlanOptionsReconfigure):
+def plan_reconfigure(preview: bool = None, rolling_interval: Optional[int] = None):
     """
     Renconfigures required TDP services.
     """
@@ -86,8 +92,21 @@ def plan_from_import(options: Path):
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def plan_costum(options: PlanOptionsCostum):
+def plan_costum(
+    operation_names: str,
+    extra_vars: str,
+    hosts: str,
+    options: Optional[PlanOptionsDag] = None,
+):
     """
     Customizes an existing plan.
+
+    options:
+
+    - restart: bool
+
+    - reverse: bool
+
+    - stop: bool
     """
     pass
