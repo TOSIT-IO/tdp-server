@@ -26,7 +26,7 @@ def get_deployments():
 
 @router.get(
     "/{deployement_id}",
-    response_model=CursorPage[DeploymentLog],
+    response_model=DeploymentLog,
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployment(deployement_id: int):
