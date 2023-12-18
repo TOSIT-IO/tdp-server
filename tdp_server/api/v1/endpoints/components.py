@@ -3,12 +3,9 @@ from fastapi_pagination.cursor import CursorPage
 from typing import List
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.common import StateEnum
 from tdp_server.schemas.components import (
     Component,
     ComponentUpdateResponse,
-    ComponentGenerateStalesOptions,
-    StaleComponent,
     StatusHistory,
 )
 from tdp_server.schemas.variables import Variables
@@ -40,7 +37,12 @@ def get_component(service_id: str, component_id: str):
     },
 )
 def put_component(
-    service_id: str, component_id: str, options: Component, status: StateEnum
+    service_id: str,
+    component_id: str,
+    to_config: bool,
+    to_restart: bool,
+    running_version: str,
+    configured_version: str,
 ):
     """
     Changes the version or status of the component.
@@ -82,25 +84,11 @@ def provide_component_variables(
 
 @router.get(
     "/{component_id}/status-history",
-    response_model=StatusHistory,
+    response_model=CursorPage[StatusHistory],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_component_history(service_id: str, component_id: str):
     """
     Show history of all services and components running and configured versions.
-    """
-    pass
-
-
-@router.post(
-    "/{component_id}/stales",
-    response_model=List[StaleComponent],
-    responses={**dependencies.COMMON_RESPONSES},
-)
-def provide_stales(
-    service_id: str, component_id: str, options: ComponentGenerateStalesOptions
-):
-    """
-    Pass the component to stale.
     """
     pass

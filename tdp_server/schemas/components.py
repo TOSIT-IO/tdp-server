@@ -1,12 +1,7 @@
 from datetime import datetime
-from typing import Optional
-
 from pydantic import BaseModel
 
-from tdp_server.schemas.common import (
-    ServiceOrComponentUpdateResponse,
-    CommonOptions,
-)
+from tdp_server.schemas.common import ServiceOrComponentUpdateResponse
 from tdp_server.schemas.status import CurrentStatus
 
 
@@ -40,15 +35,5 @@ class StatusHistory(CurrentStatus):
     event_time: datetime
 
 
-class StaleComponent(BaseModel):
-    service: str
-    component: str
-    stale: bool
-
-
 class ComponentUpdateResponse(ServiceOrComponentUpdateResponse):
-    pass
-
-
-class ComponentGenerateStalesOptions(CommonOptions):
     pass
