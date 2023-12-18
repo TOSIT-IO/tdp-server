@@ -22,7 +22,6 @@ def deploy(
     dry: bool = False,
     mock_deploy: bool = False,
     validate: bool = True,
-    vars: Path = None,
 ):
     """
     Deploys the planned dag/operations.
@@ -36,7 +35,5 @@ def deploy(
         - mock_deploy: Mock the deploy, do not actually run the ansible playbook.
 
         - validate: validates service variables.
-
-        - vars: Path to the TDP variables.
     """
     pass
