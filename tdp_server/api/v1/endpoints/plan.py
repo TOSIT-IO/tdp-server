@@ -3,15 +3,16 @@ from typing import List, Optional
 from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.plan import PlanOptionsDag
+from tdp_server.schemas.plan import PlanOptionsDag, PlanDag
 from tdp_server.schemas.operations import Operation
+from tdp.core.models.operation_model import OperationModel
 
 router = APIRouter()
 
 
 @router.post(
     "/dag",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_dag(
@@ -35,7 +36,7 @@ def plan_dag(
 
 @router.post(
     "/operations",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_operations(operation_names: str, extra_vars: str, hosts: str):
@@ -47,7 +48,7 @@ def plan_operations(operation_names: str, extra_vars: str, hosts: str):
 
 @router.post(
     "/resume",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_resume(preview: bool = False):
@@ -59,7 +60,7 @@ def plan_resume(preview: bool = False):
 
 @router.post(
     "/reconfigure",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_reconfigure(preview: bool = None, rolling_interval: Optional[int] = None):
@@ -71,7 +72,7 @@ def plan_reconfigure(preview: bool = None, rolling_interval: Optional[int] = Non
 
 @router.post(
     "/import",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
@@ -86,14 +87,14 @@ def plan_from_import(options: Path):
 
 @router.post(
     "/custom",
-    response_model=List[Operation],
+    response_model=List[PlanDag],
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
 def plan_costum(
-    operation_names: str,
+    operations: list[str],
     extra_vars: str,
     hosts: str,
     options: Optional[PlanOptionsDag] = None,
