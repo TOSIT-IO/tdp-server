@@ -2,15 +2,15 @@ from fastapi import APIRouter
 from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
+from tdp_server.schemas.deploy import DeployStatus
 from tdp_server.schemas.deployments import DeploymentLog
-from tdp_server.schemas.operations import OperationLog
 
 
 router = APIRouter()
 
 
 @router.post(
-    "/deploy",
+    "",
     response_model=DeploymentLog,
     responses={
         **dependencies.COMMON_RESPONSES,
@@ -35,5 +35,17 @@ def deploy(
         - mock_deploy: Mock the deploy, do not actually run the ansible playbook.
 
         - validate: validates service variables.
+    """
+    pass
+
+
+@router.get(
+    "/status",
+    response_model=DeployStatus,
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def get_deployment_status():
+    """
+    Shows if the last deployment was successful.
     """
     pass
