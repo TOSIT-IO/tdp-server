@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
-from typing import List, Optional
+from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 from tdp.core.utils import BaseEnum
@@ -11,15 +11,19 @@ class Operationtype(BaseEnum):
     OTHER = "Other"
 
 
+# class Operation(BaseModel):
+#     name: str
+#     type: Operationtype
+#     collection_name: Optional[str] = None
+#     depends_on: List[str] = []
+#     noop: bool = False
+#     service: str
+#     action: str
+#     component: Optional[str] = None
+    
 class Operation(BaseModel):
-    name: str
-    type: Operationtype
-    collection_name: Optional[str] = None
-    depends_on: List[str] = []
-    noop: bool = False
-    service: str
-    action: str
-    component: Optional[str] = None
+    operation: str
+    hosts: Optional[set[str]]
 
 
 class OperationLog(BaseModel):
