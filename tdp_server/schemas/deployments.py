@@ -16,10 +16,6 @@ class ResumeRequest(BaseModel):
     )
 
 
-class DeployStatus(BaseModel):
-    message: str
-
-
 class DeploymentLog(BaseModel):
     id: int
     options: Optional[dict]
@@ -28,5 +24,6 @@ class DeploymentLog(BaseModel):
     restart: bool = False
     status: DeploymentStateEnum
     deployment_type: DeploymentTypeEnum
+    deployment_url: str
     operations: List[str]
     user: Optional[str] = "NO_USER_RECORDED"
