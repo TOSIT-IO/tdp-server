@@ -11,16 +11,6 @@ class Operationtype(BaseEnum):
     OTHER = "Other"
 
 
-# class Operation(BaseModel):
-#     name: str
-#     type: Operationtype
-#     collection_name: Optional[str] = None
-#     depends_on: List[str] = []
-#     noop: bool = False
-#     service: str
-#     action: str
-#     component: Optional[str] = None
-    
 class Operation(BaseModel):
     operation: str
     hosts: Optional[set[str]]

@@ -17,7 +17,7 @@ class PlanDag(BaseModel):
     operation_order: int
     operation: str
     host: Optional[str]
-    extra_vars: Optional[List[str]] 
+    extra_vars: Optional[List[str]]
     start_time: Optional[datetime]
     end_time: datetime
     state: OperationStateEnum

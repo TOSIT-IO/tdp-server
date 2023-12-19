@@ -20,11 +20,7 @@ def get_all_get_endpoints() -> List[str]:
     Returns a list of all GET method URLs in the application
     """
     get_endpoints = []
-    [
-        get_endpoints.append(route.path)
-        for route in app.routes
-        if "GET" in route.methods
-    ]
+    [get_endpoints.append(route.path) for route in app.routes if "GET" in route.methods]
     return get_endpoints[4:]
 
 
