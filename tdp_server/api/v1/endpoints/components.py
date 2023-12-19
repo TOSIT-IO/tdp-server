@@ -87,7 +87,7 @@ def provide_component_variables(
     response_model=CursorPage[StatusHistory],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_component_history(service_id: str, component_id: str):
+def get_component_history(service_id: str, component_id: str, host: str):
     """
     Show history of all services and components running and configured versions.
     """

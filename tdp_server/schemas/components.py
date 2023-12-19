@@ -11,7 +11,6 @@ class Component(BaseModel):
     variables_url: str
     running_version: str
     configured_version: str
-    host: str
     to_config: str
     to_restart: str
 
