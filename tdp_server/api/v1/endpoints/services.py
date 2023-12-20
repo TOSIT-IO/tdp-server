@@ -2,7 +2,12 @@ from fastapi import APIRouter
 from fastapi_pagination.cursor import CursorPage
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.services import Service, ServiceConf, ServiceUpdateResponse
+from tdp_server.schemas.services import (
+    Service,
+    ServiceConf,
+    ServiceUpdateResponse,
+    ServiceSchema,
+)
 from tdp_server.schemas.variables import Variables
 
 router = APIRouter()
@@ -91,7 +96,7 @@ def provide_service_variables(
 
 @router.get(
     "/{service_id}/schema",
-    response_model={},
+    response_model=ServiceSchema,
     responses={
         **dependencies.COMMON_RESPONSES,
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
