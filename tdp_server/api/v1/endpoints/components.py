@@ -5,12 +5,28 @@ from typing import List
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.components import (
     Component,
+    Components,
     ComponentUpdateResponse,
     StatusHistory,
 )
 from tdp_server.schemas.variables import Variables
 
 router = APIRouter()
+
+
+@router.get(
+    "",
+    response_model=Components,
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def get_components(service_id: str):
+    """
+    Returns a list of components of a service.
+    """
+    pass
 
 
 @router.get(
