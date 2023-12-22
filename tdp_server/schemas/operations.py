@@ -15,6 +15,14 @@ class Operation(BaseModel):
     operation: str
     hosts: Optional[set[str]]
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "operation": "hbase_master_config",
+                "hosts": ["master-01", "master-02"],
+            }
+        }
+
 
 class OperationLog(BaseModel):
     operation: str

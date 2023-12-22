@@ -21,3 +21,6 @@ class Variables(BaseModel):
 
 class VariableValidation(BaseModel):
     message: str
+
+    class Config:
+        json_schema_extra = {"example": {"message": "Validation successful"}}

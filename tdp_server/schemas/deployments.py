@@ -1,19 +1,10 @@
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel
 
 from tdp.core.models.state_enum import DeploymentStateEnum
 from tdp.core.models.deployment_model import DeploymentTypeEnum
-from tdp_server.schemas.operations import OperationLog
-
-
-class ResumeRequest(BaseModel):
-    id: Optional[int] = Field(
-        default=None,
-        title="Deployment ID",
-        description="Deployment ID to resume from. (must be a failed deployment)",
-    )
 
 
 class DeploymentLog(BaseModel):

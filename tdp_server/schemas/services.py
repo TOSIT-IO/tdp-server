@@ -14,7 +14,7 @@ class Service(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": "hdfs",
-                "service_url": "http://.../api/v1/services/hdfs",
+                "service_url": "http://localhost/api/v1/services/hdfs",
             }
         }
 
@@ -25,6 +25,17 @@ class ServiceConf(BaseModel):
     configured_version: str
     variables_url: Optional[Path] = None
     schemas_url: Optional[Path] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "spark3",
+                "running_version": "5b67589",
+                "configured_version": "5b67589",
+                "variables_url": "http://localhost/api/v1/services/spark3/variables",
+                "schemas_url": "http://localhost/api/v1/services/spark3/schema",
+            }
+        }
 
 
 class ServiceSchema(BaseModel):
