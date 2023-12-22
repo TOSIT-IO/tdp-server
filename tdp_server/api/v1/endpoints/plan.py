@@ -94,7 +94,7 @@ def plan_from_import(options: Path):
     },
 )
 def plan_costum(
-    operations: list[str],
+    operations: List[str],
     extra_vars: str,
     hosts: str,
     options: Optional[PlanOptionsDag] = None,

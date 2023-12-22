@@ -33,7 +33,7 @@ def get_services():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def get_service(service_id: str, to_config, to_restart):
+def get_service(service_id: str, to_config: bool, to_restart: bool):
     """
     Returns the chosen service details.
     """
