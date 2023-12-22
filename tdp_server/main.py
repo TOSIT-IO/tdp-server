@@ -12,7 +12,7 @@ add_pagination(app)
 
 @app.get("/")
 async def root():
-    return {"tdp-server"}
+    return {"message": "tdp-server"}
 
 
 def get_all_get_endpoints() -> List[str]:
