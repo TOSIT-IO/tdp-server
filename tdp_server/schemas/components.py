@@ -8,7 +8,6 @@ from tdp_server.schemas.status import CurrentStatus
 
 class Component(BaseModel):
     id: str
-    service_id: str
     variables_url: str
     running_version: str
     configured_version: str
@@ -19,7 +18,6 @@ class Component(BaseModel):
         json_schema_extra = {
             "example": {
                 "id": "journalnode",
-                "service_id": "hdfs",
                 "running_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "configured_version": "ff4627859010bbd6f43808b51121972c0345bbc0",
                 "variables_url": "https://...",
