@@ -14,7 +14,9 @@ router = APIRouter()
     response_model=CursorPage[Operation],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def get_operations(options: Optional[Operationtype] = None):
+def get_operations(
+    hosts: str, topo_sort: bool = False, options: Optional[Operationtype] = None
+):
     """
     Returns a list of operations.
 
@@ -23,5 +25,7 @@ def get_operations(options: Optional[Operationtype] = None):
     - Dag: shows operations from DAG.
 
     - Other: shows other operations.
+
+    - Displays DAG operations in topological order, only works if options = DAG
     """
     pass
