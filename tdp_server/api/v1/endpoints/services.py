@@ -8,6 +8,7 @@ from tdp_server.schemas.services import (
     ServiceUpdateResponse,
     ServiceSchema,
 )
+from tdp_server.schemas.configuration import StatusHistory
 from tdp_server.schemas.variables import Variables
 
 router = APIRouter()
@@ -33,7 +34,7 @@ def get_services():
         **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def get_service(service_id: str, to_config: bool, to_restart: bool):
+def get_service(service_id: str):
     """
     Returns the chosen service details.
     """
@@ -105,5 +106,20 @@ def provide_service_variables(
 def get_service_schema(service_id: str):
     """
     Displays the service schema.
+    """
+    pass
+
+
+@router.get(
+    "{service_id}/history",
+    response_model=CursorPage[StatusHistory],
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def get_service_history(service_id):
+    """
+    Show history of a service's running and configured versions.
     """
     pass

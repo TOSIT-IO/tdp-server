@@ -34,7 +34,7 @@ def get_deployment(deployement_id: int):
 
 
 @router.get(
-    "/{deployement_id}/operations/{operation_order}/logs",
+    "/{deployement_id}/operations/{operation_order}",
     response_model=OperationLog,
     responses={**dependencies.COMMON_RESPONSES},
 )

@@ -1,12 +1,25 @@
 from fastapi import APIRouter
+from fastapi_pagination.cursor import CursorPage
 from typing import List, Optional
 from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.plan import PlanOptionsDag, PlanDag, PlanOperations
+from tdp_server.schemas.plan import PlanDag, PlanOperations
 
 
 router = APIRouter()
+
+
+@router.get(
+    "",
+    response_model=CursorPage[PlanDag],
+    responses={**dependencies.COMMON_RESPONSES},
+)
+def show_plan():
+    """
+    Shows the latest plan.
+    """
+    pass
 
 
 @router.post(
@@ -15,21 +28,17 @@ router = APIRouter()
     responses={**dependencies.COMMON_RESPONSES},
 )
 def plan_dag(
+    targets: str,
+    source: str,
+    restart: bool = False,
+    reverse: bool = False,
+    stop: bool = False,
     preview: bool = False,
-    options: Optional[PlanOptionsDag] = None,
     filter: Optional[str] = None,
     rolling_interval: Optional[int] = None,
 ):
     """
     Plans from the DAG.
-
-    options:
-
-    - restart: bool
-
-    - reverse: bool
-
-    - stop: bool
     """
     pass
 
@@ -99,11 +108,13 @@ def plan_from_import(options: Path):
         **dependencies.IMPORT_FILE_DOES_NOT_EXIST,
     },
 )
-def plan_costum(
+def plan_custom(
     operations: List[str],
     extra_vars: str,
     hosts: str,
-    options: Optional[PlanOptionsDag] = None,
+    restart: bool = False,
+    reverse: bool = False,
+    stop: bool = False,
 ):
     """
     Customizes an existing plan.

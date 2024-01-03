@@ -1,10 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
 
 from tdp.core.models.state_enum import DeploymentStateEnum
 from tdp.core.models.deployment_model import DeploymentTypeEnum
+from tdp_server.schemas.plan import PlanOperations
 
 
 class DeploymentLog(BaseModel):
@@ -16,5 +17,5 @@ class DeploymentLog(BaseModel):
     status: DeploymentStateEnum
     deployment_type: DeploymentTypeEnum
     deployment_url: str
-    operations: List[str]
+    operations: List[PlanOperations]
     user: Optional[str] = "NO_USER_RECORDED"

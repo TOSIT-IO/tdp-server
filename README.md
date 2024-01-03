@@ -36,17 +36,13 @@ Specification is available at <http://localhost:8000/docs>.
 
     [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls) recommends directly starting it from `/`, however the [Ambari server](https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/components.md) choses this endpoint prefix and it explicits what the user is using.
 
-- Some verbs in the url have been kept.
+- Verbs have been chosen where actions are done.
 
     The [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls) state that it MUST be verb-free and the same is mentioned in the[dreamfactory blog](https://blog.dreamfactory.com/best-practices-for-naming-rest-api-endpoints/). The reason is that with the path we should access ressources and the actions are defined with the GET, PUT, POST, PATCH, DELETE methods. However, with `/plan` we perform different actions such as `resume` or `reconfigure` with the same post method and both actions are not performed on different resources so introducing a verb is the best way of description. For the `deploy` endpoint the question is more debatable, however the clearest wording is favored and therefore we chose to maintain the verb.
 
 - Cursor-based pagination instead of offset-based has been chosen.
 
     This is stated as a SHOULD requirement in the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#pagination).
-
-- Error message 422 has been kept.
-
-    [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#http-status-codes-and-errors) state that error 422 must not be used. However, this status code is automatically added by the library fastapi_pagination which throws this error if it cannot proceed with the pagination and it does not seem to be configurable.
 
 ### Endpoint specific
 

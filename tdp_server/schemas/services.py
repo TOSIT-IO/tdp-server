@@ -23,6 +23,8 @@ class ServiceConf(BaseModel):
     id: str
     running_version: str
     configured_version: str
+    to_config: bool
+    to_restart: bool
     variables_url: Optional[Path] = None
     schemas_url: Optional[Path] = None
 
@@ -32,6 +34,8 @@ class ServiceConf(BaseModel):
                 "id": "spark3",
                 "running_version": "5b67589",
                 "configured_version": "5b67589",
+                "to_config": "False",
+                "to_restart": "False",
                 "variables_url": "http://localhost/api/v1/services/spark3/variables",
                 "schemas_url": "http://localhost/api/v1/services/spark3/schema",
             }

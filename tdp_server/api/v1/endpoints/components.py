@@ -3,11 +3,11 @@ from fastapi_pagination.cursor import CursorPage
 from typing import List
 
 from tdp_server.api.v1 import dependencies
+from tdp_server.schemas.configuration import StatusHistory
 from tdp_server.schemas.components import (
     Component,
     Components,
     ComponentUpdateResponse,
-    StatusHistory,
 )
 from tdp_server.schemas.variables import Variables
 
@@ -99,12 +99,12 @@ def provide_component_variables(
 
 
 @router.get(
-    "/{component_id}/status-history",
+    "/{component_id}/history",
     response_model=CursorPage[StatusHistory],
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_component_history(service_id: str, component_id: str, host: str):
     """
-    Show history of all services and components running and configured versions.
+    Show history of a component's running and configured versions.
     """
     pass

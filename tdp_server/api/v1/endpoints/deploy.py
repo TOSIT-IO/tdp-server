@@ -2,7 +2,6 @@ from fastapi import APIRouter
 from pathlib import Path
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.deploy import DeployStatus
 from tdp_server.schemas.deployments import DeploymentLog
 
 
@@ -40,12 +39,12 @@ def deploy(
 
 
 @router.get(
-    "/status",
-    response_model=DeployStatus,
+    "",
+    response_model=DeploymentLog,
     responses={**dependencies.COMMON_RESPONSES},
 )
 def get_deployment_status():
     """
-    Shows if the last deployment was successful.
+    Shows last deployment's deploymentlog.
     """
     pass

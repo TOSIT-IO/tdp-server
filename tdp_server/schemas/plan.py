@@ -3,13 +3,6 @@ from typing import Optional, List
 
 from tdp.core.models.state_enum import DeploymentStateEnum, OperationStateEnum
 from tdp.core.models.deployment_model import DeploymentTypeEnum
-from tdp.core.utils import BaseEnum
-
-
-class PlanOptionsDag(BaseEnum):
-    restart: Optional[bool] = False
-    reverse: Optional[bool] = False
-    stop: Optional[bool] = False
 
 
 class PlanOperations(BaseModel):

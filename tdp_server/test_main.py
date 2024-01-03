@@ -5,33 +5,60 @@ from tdp_server.main import app
 client = TestClient(app)
 
 
-def test_read_root():
+def test_get_all_get_endpoints():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "tdp-server"}
-
-
-def test_get_all_get_endpoints():
-    response = client.get("/get-endpoints")
-    assert response.status_code == 200
     assert response.json() == [
-        "/api/v1/services",
-        "/api/v1/services/{service_id}",
-        "/api/v1/services/{service_id}/variables",
-        "/api/v1/services/{service_id}/schema",
-        "/api/v1/services/{service_id}/components",
-        "/api/v1/services/{service_id}/components/{component_id}",
-        "/api/v1/services/{service_id}/components/{component_id}/variables",
-        "/api/v1/services/{service_id}/components/{component_id}/status-history",
-        "/api/v1/status",
-        "/api/v1/deployments",
-        "/api/v1/deployments/{deployement_id}",
-        "/api/v1/deployments/{deployement_id}/operations/{operation_order}/logs",
-        "/api/v1/deploy/status",
-        "/api/v1/validate",
-        "/api/v1/operations",
-        "/",
-        "/get-endpoints",
+        {"path": "/api/v1/deploy", "method": "get_deployment_status"},
+        {"path": "/docs", "method": "swagger_ui_html"},
+        {"path": "/api/v1/operations", "method": "get_operations"},
+        {"path": "/docs/oauth2-redirect", "method": "swagger_ui_redirect"},
+        {"path": "/api/v1/deployments/{deployement_id}", "method": "get_deployment"},
+        {"path": "/api/v1/plan", "method": "show_plan"},
+        {"path": "/api/v1/configuration/validate", "method": "get_validate"},
+        {"path": "/", "method": "read_get_endpoints"},
+        {"path": "/redoc", "method": "redoc_html"},
+        {
+            "path": "/api/v1/configuration/services/{service_id}",
+            "method": "get_service",
+        },
+        {
+            "path": "/api/v1/deployments/{deployement_id}/operations/{operation_order}",
+            "method": "get_deployment_operation",
+        },
+        {
+            "path": "/api/v1/configuration/services/{service_id}/components/{component_id}/variables",
+            "method": "get_component_variables",
+        },
+        {
+            "path": "/api/v1/configuration/services/{service_id}/variables",
+            "method": "get_service_variables",
+        },
+        {"path": "/api/v1/configuration/history", "method": "get_history"},
+        {
+            "path": "/api/v1/configuration/services/{service_id}/components/{component_id}/history",
+            "method": "get_component_history",
+        },
+        {"path": "/api/v1/configuration", "method": "get_status"},
+        {"path": "/api/v1/deployments", "method": "get_deployments"},
+        {
+            "path": "/api/v1/configuration/services/{service_id}/components/{component_id}",
+            "method": "get_component",
+        },
+        {
+            "path": "/api/v1/configuration/services/{service_id}/components",
+            "method": "get_components",
+        },
+        {
+            "path": "/api/v1/configuration/services/{service_id}/schema",
+            "method": "get_service_schema",
+        },
+        {
+            "path": "/api/v1/configuration/services{service_id}/history",
+            "method": "get_service_history",
+        },
+        {"path": "/openapi.json", "method": "openapi"},
+        {"path": "/api/v1/configuration/services", "method": "get_services"},
     ]
 
 
