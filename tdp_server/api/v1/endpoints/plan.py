@@ -18,6 +18,7 @@ def plan_dag(
     preview: bool = False,
     options: Optional[PlanOptionsDag] = None,
     filter: Optional[str] = None,
+    rolling_interval: Optional[int] = None,
 ):
     """
     Plans from the DAG.
@@ -38,7 +39,13 @@ def plan_dag(
     response_model=List[PlanOperations],
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_operations(operation_names: str, extra_vars: str, hosts: str):
+def plan_operations(
+    operation_names: str,
+    extra_vars: str,
+    hosts: str,
+    preview: bool = False,
+    rolling_interval: Optional[int] = None,
+):
     """
     Runs a list of operations.
     """
@@ -50,7 +57,7 @@ def plan_operations(operation_names: str, extra_vars: str, hosts: str):
     response_model=PlanDag,
     responses={**dependencies.COMMON_RESPONSES},
 )
-def plan_resume(preview: bool = False):
+def plan_resume(id: int, preview: bool = False):
     """
     Resumes a failed or stopped deployment.
     """
