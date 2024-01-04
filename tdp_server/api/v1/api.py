@@ -14,18 +14,18 @@ from tdp_server.api.v1.endpoints import (
 api_router = APIRouter()
 
 api_router.include_router(
-    configuration.router, prefix="/configuration", tags=["configuration"]
+    configuration.router, prefix="/configurations", tags=["configurations"]
 )
 api_router.include_router(
-    validate.router, prefix="/configuration", tags=["configuration"]
+    validate.router, prefix="/configurations", tags=["configurations"]
 )
 api_router.include_router(
-    services.router, prefix="/configuration/services", tags=["configuration"]
+    services.router, prefix="/configurations/services", tags=["configurations"]
 )
 api_router.include_router(
     components.router,
-    prefix="/configuration/services/{service_id}/components",
-    tags=["configuration"],
+    prefix="/configurations/services/{service_id}/components",
+    tags=["configurations"],
 )
 api_router.include_router(
     deployments.router, prefix="/deployments", tags=["deployments"]
