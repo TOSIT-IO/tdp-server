@@ -94,10 +94,6 @@ Specification is available at <http://localhost:8000/docs>.
 
     The previous `schema` endpoint has been attached to services as it concerns them and is therefore a subresource and is referenced via a path-segment as described in the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls).
 
-- Seperation of endpoints `components` and `services`.
-
-    Although `components` is a subresource of `service` it has been kept seperated to limit the number of resources in the latter endpoint [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls).
-
 - Query parameters have been placed in endpoint `operations` to access the subresources.
 
     Instead of accessing the three different resources (all, dag, other) seperately in the endpoint `operations`,  only the root of the endpoint is being accessed at first and a query parameter enables the user to access the subresources.
@@ -106,12 +102,12 @@ Specification is available at <http://localhost:8000/docs>.
 
     The `validate` endpoint which validates the variables has been added to have the same functionnality as in tdp-lib.
 
-- Refactored the put methods of the endpoints `services/{service_id}/` and `services/{service_id}/components/{component_id}`.
+- Refactored the put methods of the endpoints `/configurations/services/{service_id}/` and `/configurations/services/{service_id}/components/{component_id}`.
 
-    The put methods `services/{service_id}/variables` and `services/{service_id}/components/{component_id}/variables` correspond to their old counterpart without the `variables` at the end since the use is to modify the service or component variables. The paths without the `/variables` now corrspond to a new functionality which is to modify the service or component version and be able to start or stop it.
+    The put methods `/configurations/services/{service_id}/variables` and `/configurations/services/{service_id}/components/{component_id}/variables` correspond to their old counterpart without the `variables` at the end since the use is to modify the service or component variables. The paths without the `/variables` now corrspond to a new functionality which is to modify the service or component version and be able to start or stop it.
 
 - New functionalities have been added to the `plan` endpoint compared to the previous server such as:
-    - `plan/import` to plan a deployment from an imported file.
-    - `plan/custom` to customize a deployment plan.
+    - `/plan/import` to plan a deployment from an imported file.
+    - `/plan/custom` to customize a deployment plan.
 
     These functionalities exist in TDP lib, so they can also be used in the server.
