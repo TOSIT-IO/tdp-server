@@ -22,9 +22,9 @@ def get_operations(
 
     Options:
 
-    - Dag: shows operations from DAG.
+    - DAG: shows operations from DAG.
 
-    - Other: shows other operations.
+    - OTHER: shows other operations.
 
     - Displays DAG operations in topological order, only works if options = DAG
     """

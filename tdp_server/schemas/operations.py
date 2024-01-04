@@ -7,8 +7,8 @@ from tdp.core.models.state_enum import DeploymentStateEnum
 
 
 class Operationtype(BaseEnum):
-    DAG = "Dag"
-    OTHER = "Other"
+    DAG = "DAG"
+    OTHER = "OTHER"
 
 
 class Operation(BaseModel):
