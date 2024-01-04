@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from tdp_server.api.v1.endpoints import (
     components,
-    configuration,
+    configurations,
     services,
     deployments,
     deploy,
@@ -14,7 +14,7 @@ from tdp_server.api.v1.endpoints import (
 api_router = APIRouter()
 
 api_router.include_router(
-    configuration.router, prefix="/configurations", tags=["configurations"]
+    configurations.router, prefix="/configurations", tags=["configurations"]
 )
 api_router.include_router(
     validate.router, prefix="/configurations", tags=["configurations"]

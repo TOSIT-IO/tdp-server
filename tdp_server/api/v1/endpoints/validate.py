@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.variables import Variables, VariableValidation
+from tdp_server.schemas.variables import VariableValidation
 
 router = APIRouter()
 

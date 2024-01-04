@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi_pagination.cursor import CursorPage
+from typing import Optional
 
 from tdp_server.api.v1 import dependencies
 from tdp_server.schemas.services import (
@@ -8,7 +9,7 @@ from tdp_server.schemas.services import (
     ServiceUpdateResponse,
     ServiceSchema,
 )
-from tdp_server.schemas.configuration import StatusHistory
+from tdp_server.schemas.configurations import StatusHistory
 from tdp_server.schemas.variables import Variables
 
 router = APIRouter()
@@ -51,10 +52,10 @@ def get_service(service_id: str):
 )
 def put_service(
     service_id: str,
-    to_config: bool,
-    to_restart: bool,
-    running_version: str,
-    configured_version: str,
+    to_config: Optional[bool] = None,
+    to_restart: Optional[bool] = None,
+    running_version: Optional[str] = None,
+    configured_version: Optional[str] = None,
 ):
     """
     Changes the version or status of the service.
@@ -91,6 +92,24 @@ def provide_service_variables(
 ):
     """
     Modifies the service variables.
+    """
+    pass
+
+
+@router.patch(
+    "/{service_id}/variables",
+    response_model=ServiceUpdateResponse,
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.SERVICE_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def patch_service_variables(
+    service_id: str,
+    service: Variables,
+):
+    """
+    Patch the service variables.
     """
     pass
 

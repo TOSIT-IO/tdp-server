@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List
 
 from tdp_server.schemas.common import ServiceOrComponentUpdateResponse
-from tdp_server.schemas.configuration import CurrentStatus
+from tdp_server.schemas.configurations import CurrentStatus
 
 
 class Component(BaseModel):

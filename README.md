@@ -50,7 +50,7 @@ Specification is available at <http://localhost:8000/docs>.
 
 - Query parmeters in URL are written using snake_case.
 
-    The [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) recommend using snake_case or camelcase for query parameters, however in the [FastAPI documentation](https://fastapi.tiangolo.com/tutorial/query-params/) snake_case is used and it is also the way to declare variables in python. Query parameters whch a re passed in the URL are therefore also in snake_case.
+    The [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) recommend using snake_case or camelcase for query parameters, however in the [FastAPI documentation](https://fastapi.tiangolo.com/tutorial/query-params/) snake_case is used and it is also the way to declare variables in python. Query parameters whch are used as path parameters in the URL are therefore also in snake_case although they shouldn't be according to the first document but is performed in the FastAPI documentation.
 
 - Kebab-case will be used for path segments except query parameters.
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi_pagination.cursor import CursorPage
-from typing import List
+from typing import List, Optional
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.configuration import StatusHistory
+from tdp_server.schemas.configurations import StatusHistory
 from tdp_server.schemas.components import (
     Component,
     Components,
@@ -55,10 +55,10 @@ def get_component(service_id: str, component_id: str):
 def put_component(
     service_id: str,
     component_id: str,
-    to_config: bool,
-    to_restart: bool,
-    running_version: str,
-    configured_version: str,
+    to_config: Optional[bool] = None,
+    to_restart: Optional[bool] = None,
+    running_version: Optional[str] = None,
+    configured_version: Optional[str] = None,
 ):
     """
     Changes the version or status of the component.
@@ -94,6 +94,23 @@ def provide_component_variables(
 ):
     """
     Modifies the component variables.
+    """
+    pass
+
+
+@router.patch(
+    "/{component_id}/variables",
+    response_model=ComponentUpdateResponse,
+    responses={
+        **dependencies.COMMON_RESPONSES,
+        **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
+    },
+)
+def patch_component_variables(
+    service_id: str, component_id: str, component: Variables
+):
+    """
+    Patches the component variables.
     """
     pass
 

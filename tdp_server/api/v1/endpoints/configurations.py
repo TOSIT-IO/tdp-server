@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi_pagination.cursor import CursorPage
 
 from tdp_server.api.v1 import dependencies
-from tdp_server.schemas.configuration import CurrentStatus, StatusHistory
+from tdp_server.schemas.configurations import CurrentStatus, StatusHistory
 
 
 router = APIRouter()
