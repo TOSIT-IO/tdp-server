@@ -3,3 +3,4 @@ __pycache__
 .env
 dist/
 .python-version
+.pytest_cache
