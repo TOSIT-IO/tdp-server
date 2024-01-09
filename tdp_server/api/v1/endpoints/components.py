@@ -106,9 +106,7 @@ def provide_component_variables(
         **dependencies.COMPONENT_ID_DOES_NOT_EXIST_ERROR,
     },
 )
-def patch_component_variables(
-    service_id: str, component_id: str, component: Variables
-):
+def patch_component_variables(service_id: str, component_id: str, component: Variables):
     """
     Patches the component variables.
     """
