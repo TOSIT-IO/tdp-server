@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import logging
-
 from logging.config import dictConfig
 from tdp_server.log_config import logging_config, logger
 from fastapi import APIRouter
@@ -86,7 +84,7 @@ async def plan_dag(
             set_nodes.update(targets)
         set_difference = set_nodes.difference(dag.operations)
         if set_difference:
-            raise Exception(f"{set_difference} are not valid nodes.")
+            return f"{set_difference} are not valid nodes."
 
         if sources:
             logger.info(f"Creating a deployment plan from: {sources}")
@@ -94,27 +92,32 @@ async def plan_dag(
             logger.info(f"Creating a deployment plan to: {targets}")
         else:
             logger.info("Creating a deployment plan for the whole DAG.")
-        deployment = DeploymentModel.from_dag(
-            dag,
-            sources=sources,
-            targets=targets,
-            filter_expression=filter,
-            filter_type=filter_type,
-            restart=restart,
-            reverse=reverse,
-            stop=stop,
-            rolling_interval=rolling_interval,
-        )
-        output = [o.to_dict() for o in deployment.operations]
-        if preview:
-            return output
-        with get_session(database_dsn, commit_on_exit=True) as session:
-            planned_deployment = get_planned_deployment(session)
-            if planned_deployment:
-                deployment.id = planned_deployment.id
-            session.merge(deployment)
-            logger.info("DAG successfully planned")
-            return output
+        
+        try:
+            deployment = DeploymentModel.from_dag(
+                dag,
+                sources=sources,
+                targets=targets,
+                filter_expression=filter,
+                filter_type=filter_type,
+                restart=restart,
+                reverse=reverse,
+                stop=stop,
+                rolling_interval=rolling_interval,
+            )
+            output = [o.to_dict() for o in deployment.operations]
+            if preview:
+                return output
+            with get_session(database_dsn, commit_on_exit=True) as session:
+                planned_deployment = get_planned_deployment(session)
+                if planned_deployment:
+                    deployment.id = planned_deployment.id
+                session.merge(deployment)
+                logger.info("DAG successfully planned")
+                return output
+        except Exception as error:
+            logger.exception(error)
+            return {f"{type(error).__name__}": f"{error}"}
 
     database_dsn = settings.TDP_DATABASE_DSN
     filter_type = None
