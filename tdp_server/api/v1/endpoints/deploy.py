@@ -1,6 +1,8 @@
 from __future__ import annotations
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+from logging.config import dictConfig
+from tdp_server.log_config import logging_config, logger
 
 from tdp_server.api.v1 import dependencies
 from tdp_server.core.config import settings, collections
@@ -21,6 +23,8 @@ from tdp.core.variables import ClusterVariables
 
 
 router = APIRouter()
+
+dictConfig(logging_config)
 
 database_dsn = settings.TDP_DATABASE_DSN
 
@@ -79,12 +83,15 @@ def deploy_f(
         if dry:
             for _ in deployment_iterator:
                 pass
-            return "Deployment successfuly executed in dry mode"
+            output = "Deployment successfuly executed in dry mode"
+            logger.info(output)
+            return output
 
         # deployment and operations records are mutated by the iterator so we need to
         # commit them before iterating and at each iteration
         session.commit()  # Update deployment status to RUNNING, operations to PENDING
         for cluster_status_logs in deployment_iterator:
+            logger.info(f"{cluster_status_logs}")
             session.commit()  # Update operation status to RUNNING
             if cluster_status_logs and any(cluster_status_logs):
                 session.add_all(cluster_status_logs)
@@ -94,7 +101,7 @@ def deploy_f(
             message = "Deployment failed."
         else:
             message = "Deployment finished with success."
-
+    logger.info(message)
     return message
 
 
