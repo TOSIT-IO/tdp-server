@@ -1,0 +1,22 @@
+from fastapi import APIRouter
+from tdp_server.api.v2.endpoints import (
+    deployments,
+    deploy,
+    operations,
+    plan,
+    status,
+    variables,
+)
+
+
+api_router = APIRouter()
+
+api_router.include_router(status.router, prefix="/status", tags=["status"])
+api_router.include_router(variables.router, prefix="/variables", tags=["variables"])
+
+api_router.include_router(
+    deployments.router, prefix="/deployments", tags=["deployments"]
+)
+api_router.include_router(deploy.router, prefix="/deploy", tags=["deploy"])
+api_router.include_router(operations.router, prefix="/operations", tags=["operations"])
+api_router.include_router(plan.router, prefix="/plan", tags=["plan"])

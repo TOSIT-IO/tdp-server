@@ -2,114 +2,82 @@
 
 `tdp-server` provides a server to interact with [`tdp-lib`](https://github.com/tOSIT-IO/tdp-lib).
 
-A full beginers guide to launch a testing server is provided at [`docs/quick-start.md`](./docs/quick-start.md).
-
 ## Requirements
 
 The server is made with Python. The following is required:
 
-- [Python](https://www.python.org/) `^3.6`
-- [Poetry](https://python-poetry.org/) `1.1.15`
-- A RDBMS, to store deployment history (e.g. [PostgresQL](https://www.postgresql.org/))
-- An identity management system, for authentication purposes (e.g. [Keycloak](https://www.keycloak.org/))
-
-### Dev environment
-
-A dev/testing environment using Keycloak and PostgreSQL is provided through `docker-compose`:
-
-```bash
-docker-compose -f dev/docker-compose.yml up -d
-```
+- [Python](https://www.python.org/) `3.9.5`
+- [Poetry](https://python-poetry.org/) `1.7.1`
 
 ## Installation
 
-1. Use Poetry to download and install the required Python dependencies:
-   ```bash
-   poetry install
-   ```
-1. Define the required environment variables in an `.env` file. An example file is provided in `dev/.env-dev`:
-   ```bash
-   cp dev/.env-dev .env
-   ```
+Install the `tdp-server` dependencies in the pyproject.toml as follows:
 
-   In particular:
-
-   - `DATABASE_DSN`: the data source name of the RDBMS.
-   - `TDP_COLLECTION_PATH`: the path to one or more TDP collection, separated by `:` (as [`tdp-collection`](https://github.com/TOSIT-IO/tdp-collection) and [`tdp-collection-extras`](https://github.com/TOSIT-IO/tdp-collection-extras)).
-   - `TDP_VARS`: the path to an empty directory where the `tdp_vars` will be stored and versioned.
-   - `TDP_RUN_DIRECTORY`: the path to the directory where the Ansible command will be launched (as [`tdp-getting-started`](https://github.com/tOSIT-IO/tdp-getting-started) for example).
-   _Note: the `ansible.cfg` file of the working directory must contain the path of the `tdp_vars` directory defined previously._
-1. Initialize the database and the `tdp_vars` directory:
-   ```bash
-   python tdp_server/initialize_database.py
-   python tdp_server/initialize_tdp_vars.py
-   ```
+```bash
+poetry install
+```
 
 ## Usage
 
-Start the server using:
+To see the specification:
 
-```bash
-uvicorn tdp_server.main:app --reload
-```
+```sh
+# Launch the server
+poetry run uvicorn tdp_server.main:app --reload
+``` 
 
-## Build Docker Container
+Specification is available at <http://localhost:8000/docs>.
 
-```bash
-docker build -t tdp_server -f docker/Dockerfile .
-```
+## Discussion
 
-## Run Docker Container
+- Endpoint prefix `/api/v1` as base path has been chosen.
 
-Executing the container with the minimal configuration variables:
+    [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls) recommends directly starting it from `/`, however the [Ambari server](https://github.com/apache/ambari/blob/trunk/ambari-server/docs/api/v1/components.md) choses this endpoint prefix and it explicits what the user is using. Moreover the [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) states that the version must be specified.
 
-```bash
-docker run \
-  -e TDP_COLLECTION_PATH="/tdp/ops/tdp/ansible/ansible_collections/tosit/tdp" \
-  -e TDP_RUN_DIRECTORY="/tdp/ops" \
-  -e TDP_VARS="/tdp/ops/inventory/tdp_vars" \
-  -e DATABASE_DSN=sqlite:////tdp/sqlite.db \
-  -e OPENID_CONNECT_DISCOVERY_URL="http://host.docker.internal:8080/auth/realms/tdp_server/.well-known/openid-configuration" \
-  -e OPENID_CLIENT_ID=tdp_server \
-  -e OPENID_CLIENT_SECRET=secret \
-  -v "..../sqlite.db:/tdp/sqlite.db" \
-  -v"..../tdp-ops:/tdp/ops" \
-  -p 8000:8000 \
-  tdp_server
-```
+- For versioning `v1` has been chosen for first version.
 
-N.B.: Mounting a sqlite database is not the recommended way to persist the server's data.
+    `v1` has been chosen like in the Ambari server, the [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) give an example with the version `v1`, however, the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#116) state that we must chose semantic versioning.
 
-### Accessing the REST API
+- All resources are pluralized except `plan`.
 
-A token must be provided to access the API. Tokens can be obtained using the `get_token.py` script.
+    Since all resources consist of several items (configurations, services, components, deployments), the resource name is in plural form as stated as a must requirement in the [Zalando API guideline](https://opensource.zalando.com/restful-api-guidelines/#134) and in the [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html). Only the `\plan` resource is singular since there is only one plan before it can be deployed and also to be consistent with TDP lib.
 
-For example, using `curl`:
+- All resource names are written in lower-case.
 
-```bash
-token=$(python get_token.py)
-curl -H "Authorization: Bearer $token" http://localhost:8000/api/v1/service/
-```
+    As stated in the [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) all resource names must be written in lower-case.
 
-### Accessing the API documentation pages
+- Query parmeters in URL are written using snake_case.
 
-Documentation pages of the API are available at:
+    The [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) recommend using snake_case or camelcase for query parameters, however in the [FastAPI documentation](https://fastapi.tiangolo.com/tutorial/query-params/) snake_case is used and it is also the way to declare variables in python. Query parameters whch are used as path parameters in the URL are therefore also in snake_case although they shouldn't be according to the first document but is performed in the FastAPI documentation.
 
-- OpenAPI UI <http://localhost:8000/docs>
-- ReDoc UI <http://localhost:8000/redoc>
+- Kebab-case will be used for path segments except query parameters.
 
-## Contributing
+    For now, no resource name or action is a combination of two words. However, if it is the case, kebab-case must be used as stated in the [Naming Conventions of the Australian government API](https://api.gov.au/sections/naming-conventions.html) and the [Zalando API guideline](https://opensource.zalando.com/restful-api-guidelines/#129).
 
-`tdp-server` uses [Git Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to enforce consistency in the code and commit messages.
+- Verbs have been chosen where actions are done.
 
-Use Poetry to install the hooks:
+    The [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#urls) state that it MUST be verb-free and the same is mentioned in the[dreamfactory blog](https://blog.dreamfactory.com/best-practices-for-naming-rest-api-endpoints/). The reason is that with the path we should access ressources and the actions are defined with the GET, PUT, POST, PATCH, DELETE methods. However, we are not using a REST API and with `/plan` we perform different actions such as `resume` or `reconfigure` with the same post method and both actions are not performed on different resources so introducing a verb is the best way of description. For the `deploy` endpoint the question is more debatable, however the clearest wording is favored and therefore we chose to maintain the verb.
 
-```bash
-poetry run pre-commit install --hook-type pre-commit
-poetry run pre-commit install --hook-type commit-msg
-```
+- No empty path segments and trailing slashes.
 
-The following environment variables can be used to ease development:
+    The [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#136) state that the URL must not have any empty path segments or trailing slashes. The [FastAPI documentation](https://fastapi.tiangolo.com/tutorial/query-params/) give an example where there is a trailing slash, however to be as clean as possible and avoid any confusion no trailing slash occurs in any URL.
 
-- `DO_NOT_USE_IN_PRODUCTION_DISABLE_TOKEN_CHECK`
-- `MOCK_DEPLOY`
+- Used domain specific resource names.
+
+    Each resource name is domain specific which represent either the elements in TDP (`/services` and `/components`) or actions in TDP Manager as stated as a must requirement in the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#142).
+
+- Resources and sub-resources are identified via path segments.
+
+    The `components` resource is a sub-resource of `services` which is a sub-resource of `configurations`. The path segment for a component looks the following `/api/v1/configurations/services/{service_id}/components/{component_id}`. This has been chosen to improve consumer experience while following the setup of TDP. The [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#143) state this practice as a must requirement.
+
+- Cursor-based pagination instead of offset-based has been chosen.
+
+    This is stated as a SHOULD requirement in the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#pagination).
+
+- JSON is used as response body.
+
+    The JSON format is used as response body of every endpoint so that each function returns a JSON object as stated as a must requirement in the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#167). Schemas are written using the Pydantic BaseModel which will read the body as JSON. The [FastAPI documentation](https://fastapi.tiangolo.com/tutorial/body/) shows this method to declare request bodies.
+
+- Enum values are declared as UPPER_CASE.
+
+    As recommended by the [Zalando API guidelines](https://opensource.zalando.com/restful-api-guidelines/#240) enum values should be written as UPPER_SNAKE_CASE.

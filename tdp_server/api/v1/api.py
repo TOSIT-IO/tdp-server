@@ -1,21 +1,35 @@
 from fastapi import APIRouter
-
 from tdp_server.api.v1.endpoints import (
-    component,
+    components,
+    configurations,
+    services,
+    deployments,
     deploy,
-    operation,
+    operations,
     plan,
-    schema,
-    service,
+    validate,
 )
+
 
 api_router = APIRouter()
 
-api_router.include_router(service.router, prefix="/service", tags=["services"])
 api_router.include_router(
-    component.router, prefix="/service/{service_id}/component", tags=["components"]
+    configurations.router, prefix="/configurations", tags=["configurations"]
+)
+api_router.include_router(
+    validate.router, prefix="/configurations", tags=["configurations"]
+)
+api_router.include_router(
+    services.router, prefix="/configurations/services", tags=["configurations"]
+)
+api_router.include_router(
+    components.router,
+    prefix="/configurations/services/{service_id}/components",
+    tags=["configurations"],
+)
+api_router.include_router(
+    deployments.router, prefix="/deployments", tags=["deployments"]
 )
 api_router.include_router(deploy.router, prefix="/deploy", tags=["deploy"])
-api_router.include_router(operation.router, prefix="/operation", tags=["operation"])
+api_router.include_router(operations.router, prefix="/operations", tags=["operations"])
 api_router.include_router(plan.router, prefix="/plan", tags=["plan"])
-api_router.include_router(schema.router, prefix="/schema", tags=["schema"])

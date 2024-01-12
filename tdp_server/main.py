@@ -1,28 +1,30 @@
-import logging
-from typing import Callable
+from fastapi import FastAPI
+from fastapi_pagination import add_pagination
+from typing import List
 
-from fastapi import Request, Response
-
-from tdp_server.app import create_app
-from tdp_server.core.config import settings
-from tdp_server.core.log_config import init_loggers
-
-init_loggers()
-
-logger = logging.getLogger("tdp_server")
-logger.setLevel(settings.LOG_LEVEL)
-
-app = create_app()
+from tdp_server.api.v1.api import api_router
 
 
-@app.middleware("http")
-async def cache_control_middleware(request: Request, call_next: Callable):
-    response: Response = await call_next(request)
-    if request.method == "GET" and not "Cache-Control" in response.headers:
-        response.headers["Cache-Control"] = "no-cache"
-    return response
+app = FastAPI()
+app.include_router(api_router, prefix="/api/v1")
+add_pagination(app)
 
 
-@app.get("/")
-async def root():
-    return {"message": settings.PROJECT_NAME}
+def get_all_get_endpoints() -> List[str]:
+    """
+    Returns a list of all GET method URLs in the application
+    """
+    endpoints = set()
+    for route in app.routes:
+        if "GET" in route.methods:
+            endpoints.add((route.path, route.endpoint.__name__))
+
+    return [{"path": path, "method": method} for path, method in endpoints]
+
+
+@app.get("/", response_model=List)
+async def read_get_endpoints():
+    """
+    Lists all other GET method URLs
+    """
+    return get_all_get_endpoints()

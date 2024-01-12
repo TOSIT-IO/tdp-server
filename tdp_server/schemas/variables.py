@@ -1,13 +1,13 @@
 from typing import Any, Mapping
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 class Variables(BaseModel):
-    __root__: Mapping[str, Any]
+    RootModel: Mapping[str, Any]
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "hadoop_log_dir": "/var/log/hadoop",
                 "yarn_site": {"yarn.http.policy": "HTTPS_ONLY"},
@@ -17,3 +17,10 @@ class Variables(BaseModel):
                 " You can use any kind of data understood as a JSON object"
             ),
         }
+
+
+class VariableValidation(BaseModel):
+    message: str
+
+    class Config:
+        json_schema_extra = {"example": {"message": "Validation successful"}}
