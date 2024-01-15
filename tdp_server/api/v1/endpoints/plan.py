@@ -1,8 +1,8 @@
-from __future__ import annotations
+# from __future__ import annotations
 
-from logging.config import dictConfig
-from tdp_server.log_config import logging_config, logger
-from fastapi import APIRouter
+import logging
+
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi_pagination.cursor import CursorPage
 from typing import List, Optional
@@ -15,7 +15,7 @@ from tdp_server.core.config import settings, collections
 from tdp_server.schemas.plan import PlanDag, PlanOperations
 
 
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from tdp.cli.queries import get_planned_deployment
 from tdp.cli.session import get_session
@@ -26,7 +26,9 @@ from tdp.core.models import DeploymentModel, FilterTypeEnum
 
 router = APIRouter()
 
-dictConfig(logging_config)
+logger = logging.getLogger("tdp_server_logger.plan")
+
+database_dsn = settings.TDP_DATABASE_DSN
 
 
 @router.get(
@@ -38,7 +40,26 @@ def show_plan():
     """
     Shows the latest plan.
     """
-    pass
+    with get_session(database_dsn, commit_on_exit=True) as session:
+        planned_deployment = get_planned_deployment(session)
+        if planned_deployment:
+            operation_list = [o.to_dict() for o in planned_deployment.operations]
+            output = {
+                "deployment_id": planned_deployment.id,
+                "state": planned_deployment.state,
+                "deployment_type": planned_deployment.deployment_type,
+                "operations": operation_list,
+                "options": planned_deployment.options,
+            }
+            logger.info("GET show_plan Success")
+            return JSONResponse(content=output)
+        else:
+            message = "No planned deployment"
+            logger.error(message)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=message,
+            )
 
 
 @router.post(
@@ -70,12 +91,15 @@ async def plan_dag(
         reverse: bool,
         stop: bool,
         filter: Optional[str] = None,
-        filter_type: Optional[FilterTypeEnum] = None,
         rolling_interval: Optional[int] = None,
     ):
         """Deploy from the DAG."""
         if stop and restart:
-            return "Cannot use `--restart` and `--stop` at the same time."
+            logger.error("Cannot use `--restart` and `--stop` at the same time.")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Cannot use `--restart` and `--stop` at the same time.",
+            )
         dag = Dag(collections)
         set_nodes = set()
         if sources:
@@ -84,7 +108,11 @@ async def plan_dag(
             set_nodes.update(targets)
         set_difference = set_nodes.difference(dag.operations)
         if set_difference:
-            return f"{set_difference} are not valid nodes."
+            logger.error(f"{set_difference} are not valid nodes.")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"{set_difference} are not valid nodes.",
+            )
 
         if sources:
             logger.info(f"Creating a deployment plan from: {sources}")
@@ -92,35 +120,50 @@ async def plan_dag(
             logger.info(f"Creating a deployment plan to: {targets}")
         else:
             logger.info("Creating a deployment plan for the whole DAG.")
-        
+
         try:
             deployment = DeploymentModel.from_dag(
                 dag,
                 sources=sources,
                 targets=targets,
                 filter_expression=filter,
-                filter_type=filter_type,
+                filter_type=None,
                 restart=restart,
                 reverse=reverse,
                 stop=stop,
                 rolling_interval=rolling_interval,
             )
-            output = [o.to_dict() for o in deployment.operations]
+            operation_list = [o.to_dict() for o in deployment.operations]
+            output = {
+                "deployment_id": deployment.id,
+                "state": deployment.state,
+                "deployment_type": deployment.deployment_type,
+                "operations": operation_list,
+                "options": deployment.options,
+            }
             if preview:
+                logger.info("DAG preview successfully planned")
                 return output
+
             with get_session(database_dsn, commit_on_exit=True) as session:
                 planned_deployment = get_planned_deployment(session)
                 if planned_deployment:
                     deployment.id = planned_deployment.id
                 session.merge(deployment)
+                [
+                    o.update({"deployment_id": get_planned_deployment(session).id})
+                    for o in operation_list
+                ]
+                output.update({"deployment_id": get_planned_deployment(session).id})
                 logger.info("DAG successfully planned")
                 return output
         except Exception as error:
-            logger.exception(error)
-            return {f"{type(error).__name__}": f"{error}"}
+            logger.error(error)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail={f"{type(error).__name__}": f"{error}"},
+            )
 
-    database_dsn = settings.TDP_DATABASE_DSN
-    filter_type = None
     message = dag(
         sources,
         targets,
@@ -131,7 +174,6 @@ async def plan_dag(
         reverse,
         stop,
         filter,
-        filter_type,
         rolling_interval,
     )
     return JSONResponse(content=message)
