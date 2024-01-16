@@ -1,36 +1,18 @@
 import logging
 
-LOG_LEVEL: str = "DEBUG"
-FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging_config = {
-    "version": 1,
-    "formatters": {
-        "basic": {
-            "format": FORMAT,
-        }
-    },
-    "handlers": {
-        "console": {
-            "formatter": "basic",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stderr",
-            "level": LOG_LEVEL,
-        }
-    },
-    "loggers": {
-        "tdp_server_logger": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL,
-            # "propagate": False
-        }
-    },
-}
+numeric_level = logging.INFO
 
-# create logger
-logger = logging.getLogger("tdp_server_logger")
-# 'application' code
-# logger.debug("debug message")
-# logger.info("info message")
-# logger.warning("warn message")
-# logger.error("error message")
-# logger.critical("critical message")
+# Chose the streamhandler as Handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(numeric_level)
+# Create a formatter and attach it to the handler
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+console_handler.setFormatter(formatter)
+
+# Get the root logger and set its level to the specified level
+logger = logging.getLogger()
+logger.setLevel(numeric_level)
+# Add the console handler to the logger
+logger.addHandler(console_handler)
+# Set the TDP-lib logger at level WARNING
+logging.getLogger("tdp").setLevel(logging.WARNING)

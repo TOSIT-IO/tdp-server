@@ -26,7 +26,7 @@ from tdp.core.models import DeploymentModel, FilterTypeEnum
 
 router = APIRouter()
 
-logger = logging.getLogger("tdp_server_logger.plan")
+logger = logging.getLogger(__name__)
 
 database_dsn = settings.TDP_DATABASE_DSN
 

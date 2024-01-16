@@ -4,14 +4,13 @@ from logging.config import dictConfig
 from typing import List
 
 from tdp_server.api.v1.api import api_router
-from tdp_server.log_config import logging_config, logger
+from tdp_server.log_config import logger
 
 
 app = FastAPI()
 app.include_router(api_router, prefix="/api/v1")
 add_pagination(app)
 
-dictConfig(logging_config)
 logger.info("Server ready")
 
 def get_all_get_endpoints() -> List[str]:

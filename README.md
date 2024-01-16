@@ -23,7 +23,7 @@ To see the specification:
 
 ```sh
 # Launch the server
-poetry run uvicorn tdp_server.main:app --reload
+poetry run uvicorn tdp_server.main:app --reload --log-level=error
 ``` 
 
 Specification is available at <http://localhost:8000/docs>.

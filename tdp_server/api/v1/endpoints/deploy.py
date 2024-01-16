@@ -28,7 +28,7 @@ router = APIRouter()
 
 # dictConfig(logging_config)
 
-logger = logging.getLogger("tdp_server_logger.deploy")
+logger = logging.getLogger(__name__)
 
 database_dsn = settings.TDP_DATABASE_DSN
 
