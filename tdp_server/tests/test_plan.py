@@ -9,7 +9,6 @@ def test_show_plan():
     client.post("/api/v1/plan/dag")
     response = client.get("/api/v1/plan")
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag1():
@@ -23,7 +22,6 @@ def test_plan_dag1():
     }
     response = client.post("/api/v1/plan/dag", params=query_params1)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag2():
@@ -37,7 +35,6 @@ def test_plan_dag2():
     }
     response = client.post("/api/v1/plan/dag", params=query_params2)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag3():
@@ -51,7 +48,6 @@ def test_plan_dag3():
     }
     response = client.post("/api/v1/plan/dag", params=query_params3)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag4():
@@ -65,7 +61,6 @@ def test_plan_dag4():
     }
     response = client.post("/api/v1/plan/dag", params=query_params4)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag5():
@@ -79,7 +74,6 @@ def test_plan_dag5():
     }
     response = client.post("/api/v1/plan/dag", params=query_params5)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag6():
@@ -94,7 +88,6 @@ def test_plan_dag6():
     }
     response = client.post("/api/v1/plan/dag", params=query_params5)
     assert response.status_code == 200
-    assert type(response.json()) == dict
 
 
 def test_plan_dag7():

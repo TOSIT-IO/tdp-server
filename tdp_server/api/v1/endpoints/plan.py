@@ -43,7 +43,9 @@ def show_plan():
     with get_session(database_dsn, commit_on_exit=True) as session:
         planned_deployment = get_planned_deployment(session)
         if planned_deployment:
-            operation_list = [o.to_dict() for o in planned_deployment.operations]
+            operation_list = [
+                o.to_dict() for o in planned_deployment.operations
+            ]
             output = {
                 "deployment_id": planned_deployment.id,
                 "state": planned_deployment.state,
@@ -53,6 +55,17 @@ def show_plan():
             }
             logger.info("GET show_plan Success")
             return JSONResponse(content=output)
+            # operation_list = [
+            #     PlanOperations(**o.to_dict()) for o in planned_deployment.operations
+            # ]
+            # output = PlanDag(
+            #     deployment_id=planned_deployment.id,
+            #     state=planned_deployment.state,
+            #     deployment_type=planned_deployment.deployment_type,
+            #     operations=operation_list,
+            #     options=planned_deployment.options,
+            # )
+            # return output
         else:
             message = "No planned deployment"
             logger.error(message)
@@ -80,103 +93,78 @@ async def plan_dag(
     """
     Plans from the DAG.
     """
+    if stop and restart:
+        logger.error("Cannot use `--restart` and `--stop` at the same time.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Cannot use `--restart` and `--stop` at the same time.",
+        )
+    dag = Dag(collections)
+    set_nodes = set()
+    if sources:
+        set_nodes.update(sources)
+    if targets:
+        set_nodes.update(targets)
+    set_difference = set_nodes.difference(dag.operations)
+    if set_difference:
+        logger.error(f"{set_difference} are not valid nodes.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{set_difference} are not valid nodes.",
+        )
 
-    def dag(
-        sources: tuple[str],
-        targets: tuple[str],
-        restart: bool,
-        preview: bool,
-        collections: Collections,
-        database_dsn: str,
-        reverse: bool,
-        stop: bool,
-        filter: Optional[str] = None,
-        rolling_interval: Optional[int] = None,
-    ):
-        """Deploy from the DAG."""
-        if stop and restart:
-            logger.error("Cannot use `--restart` and `--stop` at the same time.")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Cannot use `--restart` and `--stop` at the same time.",
-            )
-        dag = Dag(collections)
-        set_nodes = set()
-        if sources:
-            set_nodes.update(sources)
-        if targets:
-            set_nodes.update(targets)
-        set_difference = set_nodes.difference(dag.operations)
-        if set_difference:
-            logger.error(f"{set_difference} are not valid nodes.")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"{set_difference} are not valid nodes.",
-            )
+    if sources:
+        logger.info(f"Creating a deployment plan from: {sources}")
+    elif targets:
+        logger.info(f"Creating a deployment plan to: {targets}")
+    else:
+        logger.info("Creating a deployment plan for the whole DAG.")
 
-        if sources:
-            logger.info(f"Creating a deployment plan from: {sources}")
-        elif targets:
-            logger.info(f"Creating a deployment plan to: {targets}")
-        else:
-            logger.info("Creating a deployment plan for the whole DAG.")
+    try:
+        deployment = DeploymentModel.from_dag(
+            dag,
+            sources=sources,
+            targets=targets,
+            filter_expression=filter,
+            filter_type=None,
+            restart=restart,
+            reverse=reverse,
+            stop=stop,
+            rolling_interval=rolling_interval,
+        )
+        operation_list = [PlanOperations(**o.to_dict()) for o in deployment.operations]
+        output = PlanDag(
+            deployment_id=deployment.id,
+            state=deployment.state,
+            deployment_type=deployment.deployment_type,
+            operations=operation_list,
+            options=deployment.options,
+        )
+        if preview:
+            logger.info("DAG preview successfully planned")
+            return output
 
-        try:
-            deployment = DeploymentModel.from_dag(
-                dag,
-                sources=sources,
-                targets=targets,
-                filter_expression=filter,
-                filter_type=None,
-                restart=restart,
-                reverse=reverse,
-                stop=stop,
-                rolling_interval=rolling_interval,
-            )
-            operation_list = [o.to_dict() for o in deployment.operations]
-            output = {
-                "deployment_id": deployment.id,
-                "state": deployment.state,
-                "deployment_type": deployment.deployment_type,
-                "operations": operation_list,
-                "options": deployment.options,
-            }
-            if preview:
-                logger.info("DAG preview successfully planned")
-                return output
-
-            with get_session(database_dsn, commit_on_exit=True) as session:
-                planned_deployment = get_planned_deployment(session)
-                if planned_deployment:
-                    deployment.id = planned_deployment.id
-                session.merge(deployment)
-                [
-                    o.update({"deployment_id": get_planned_deployment(session).id})
-                    for o in operation_list
-                ]
-                output.update({"deployment_id": get_planned_deployment(session).id})
-                logger.info("DAG successfully planned")
-                return output
-        except Exception as error:
-            logger.error(error)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={f"{type(error).__name__}": f"{error}"},
-            )
-
-    message = dag(
-        sources,
-        targets,
-        restart,
-        preview,
-        collections,
-        database_dsn,
-        reverse,
-        stop,
-        filter,
-        rolling_interval,
-    )
-    return JSONResponse(content=message)
+        with get_session(database_dsn, commit_on_exit=True) as session:
+            planned_deployment = get_planned_deployment(session)
+            if planned_deployment:
+                deployment.id = planned_deployment.id
+            session.merge(deployment)
+            output.deployment_id = get_planned_deployment(session).id
+            output.operations = [
+                o.model_copy(
+                    update={"deployment_id": int(get_planned_deployment(session).id)}
+                )
+                for o in output.operations
+            ]
+            logger.info("DAG successfully planned")
+            logger.info(type(output))
+            return output
+    except Exception as error:
+        logger.error(error)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={f"{type(error).__name__}": f"{error}"},
+        )
 
 
 @router.post(
