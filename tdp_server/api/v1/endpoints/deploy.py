@@ -5,9 +5,6 @@ import logging
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
-# from logging.config import dictConfig
-# from tdp_server.log_config import logging_config, logger
-
 from tdp_server.api.v1 import dependencies
 from tdp_server.core.config import settings, collections
 from tdp_server.schemas.deploy import DeploymentStart
@@ -15,6 +12,7 @@ from tdp_server.schemas.deploy import DeploymentStart
 from tdp.cli.queries import (
     get_planned_deployment,
     get_sch_status,
+    get_running_deployment,
 )
 from tdp.cli.session import get_session
 from tdp.cli.utils import check_services_cleanliness, print_deployment
@@ -25,8 +23,6 @@ from tdp.core.variables import ClusterVariables
 
 
 router = APIRouter()
-
-# dictConfig(logging_config)
 
 logger = logging.getLogger(__name__)
 
@@ -122,23 +118,22 @@ def get_deployment_status():
 
     with get_session(database_dsn) as session:
         try:
-            deployment = (
-                session.query(DeploymentModel)
-                .where(DeploymentModel.state == "Running")
-                .order_by(DeploymentModel.id.desc())
-                .limit(1)
-                .one()
-            )
+            deployment = get_running_deployment(session)
             if deployment:
                 operations1 = [o.to_dict() for o in deployment.operations]
-                output = {
-                    "deployment_id": deployment.id,
-                    "state": deployment.state,
-                    "deployment_type": deployment.deployment_type,
-                    "operations": operations1,
-                    "options": deployment.options,
-                }
-                return JSONResponse(output)
+                output = DeploymentStart(
+                    id= deployment.id,
+                    state= deployment.state,
+                    start_time= deployment.start_time,
+                    deployment_type = deployment.deployment_type,
+                    operations = operations1,
+                    deployment_url= "",
+                    options= deployment.options,
+                    user= "toto",
+                )
+                logger.info("GET deployment_status success")
+                return output
+            
         except Exception as error:
             logger.error(error)
             raise HTTPException(

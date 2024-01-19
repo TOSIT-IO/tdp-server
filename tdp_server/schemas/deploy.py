@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from tdp.core.models.state_enum import DeploymentStateEnum
 from tdp.core.models.deployment_model import DeploymentTypeEnum
@@ -17,10 +17,10 @@ class DeployStatus(BaseModel):
 class DeploymentStart(BaseModel):
     id: int
     options: Optional[dict]
-    start_time: datetime
+    start_time: Union[datetime, None]
     restart: bool = False
-    status: DeploymentStateEnum
+    state: DeploymentStateEnum
     deployment_type: DeploymentTypeEnum
     deployment_url: str
-    operations: List[PlanOperations]
+    operations: Union[List[PlanOperations], None]
     user: Optional[str] = "NO_USER_RECORDED"
