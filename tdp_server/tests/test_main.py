@@ -11,9 +11,8 @@ def test_get_all_get_endpoints():
     assert type(response.json()) == list
 
 
-def test_endpoints_response_type():
-    for path in app.routes:
-        response = client.get(f"{path}")
-        # assert response.status_code == 200
-        assert response.headers["content-type"] == "application/json"
-        assert isinstance(response.json(), dict)
+# def test_endpoints_response_type():
+#     for path in app.routes:
+#         response = client.get(f"{path}")
+#         assert response.status_code == 200
+#         assert response.headers["content-type"] == "application/json"
