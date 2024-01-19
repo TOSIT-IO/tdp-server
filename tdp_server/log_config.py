@@ -15,4 +15,4 @@ logger.setLevel(numeric_level)
 # Add the console handler to the logger
 logger.addHandler(console_handler)
 # Set the TDP-lib logger at level WARNING
-logging.getLogger("tdp").setLevel(logging.WARNING)
+# logging.getLogger("tdp").setLevel(logging.WARNING)
